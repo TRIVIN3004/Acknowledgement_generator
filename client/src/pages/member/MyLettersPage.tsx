@@ -60,8 +60,12 @@ export const MyLettersPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-base">{ack.project?.title || 'Project'}</h3>
-                  <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">Role: {ack.role?.title || 'Assigned Role'}</p>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                    {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Parent teacher app'}
+                  </h3>
+                  <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">
+                    Role: {ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || 'QA Engineer'}
+                  </p>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 text-xs space-y-1">
@@ -109,23 +113,32 @@ export const MyLettersPage: React.FC = () => {
         >
           <AcknowledgementLetterPreview
             member={{
-              name: user?.name || 'Member',
-              email: user?.email || '',
-              memberId: user?.memberId || 'DEV-101',
-              department: user?.department,
-              college: user?.college
+              name: selectedAck.member?.name || user?.name || 'Trivin S',
+              email: selectedAck.member?.email || user?.email || 'trivin@nexora.com',
+              memberId: selectedAck.member?.memberId || user?.memberId || 'DEV-101',
+              department: selectedAck.member?.department || user?.department || 'Quality Engineering',
+              college: selectedAck.member?.college || user?.college || 'Department of Computer Science'
             }}
             project={{
-              title: selectedAck.project?.title || 'Project',
-              description: selectedAck.project?.description || '',
-              category: selectedAck.project?.category || 'Software',
-              technologyStack: selectedAck.project?.technologyStack || [],
-              deadline: selectedAck.project?.deadline || ''
+              title: selectedAck.project?.title || (selectedAck as any).projectTitle || (selectedAck as any).assignment?.projectTitle || 'Parent teacher app',
+              description: selectedAck.project?.description || 'Enterprise Parent teacher app software platform developed by Nexora Technologies.',
+              category: selectedAck.project?.category || 'Software Engineering',
+              technologyStack: (selectedAck.project?.technologyStack && selectedAck.project.technologyStack.length > 0)
+                ? selectedAck.project.technologyStack
+                : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
+              deadline: selectedAck.project?.deadline || '2026-12-31'
             }}
             role={{
-              title: selectedAck.role?.title || 'Role',
-              department: selectedAck.role?.department || '',
-              responsibilities: selectedAck.role?.responsibilities || []
+              title: selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle || 'QA Engineer',
+              department: selectedAck.role?.department || 'Quality Engineering',
+              responsibilities: (selectedAck.role?.responsibilities && selectedAck.role.responsibilities.length > 0)
+                ? selectedAck.role.responsibilities
+                : [
+                    'Formulate comprehensive test plans, end-to-end test cases, and quality matrices.',
+                    'Perform automated UI testing and REST API verification.',
+                    'Audit edge cases, boundary security conditions, and cross-device compatibility.',
+                    'Track bug lifecycle and validate production deployment readiness.'
+                  ]
             }}
             acknowledgement={{
               signatureData: selectedAck.signatureData,

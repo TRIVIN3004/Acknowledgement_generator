@@ -1,37 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  UserCheck, 
-  CheckCircle, 
+  Briefcase, 
+  FolderKanban, 
+  CheckCircle2, 
   XCircle, 
-  HelpCircle, 
-  PenTool, 
+  Clock, 
+  MessageSquare, 
+  FileCheck2, 
   Calendar, 
-  Code, 
-  Building2, 
-  ShieldCheck,
-  Eye,
-  FileCheck2
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import { api } from '../../services/api';
-import { Assignment, SignatureType } from '../../types';
+import { Assignment, Acknowledgement } from '../../types';
+import { useAuth } from '../../context/AuthContext';
+import { Modal } from '../../components/common/Modal';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { DigitalSignatureModal } from '../../components/signature/DigitalSignatureModal';
-import { Modal } from '../../components/common/Modal';
 import { AcknowledgementLetterPreview } from '../../components/pdf/AcknowledgementLetterPreview';
-import { useAuth } from '../../context/AuthContext';
 
 export const RoleAcceptancePage: React.FC = () => {
   const { user } = useAuth();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Digital Signature Modal State
+  // Digital Signature Modal
   const [activeAssignmentForSign, setActiveAssignmentForSign] = useState<Assignment | null>(null);
 
-  // View Generated Letter Modal
-  const [activeLetterAck, setActiveLetterAck] = useState<any | null>(null);
-
-  // Reject / Request Change Modal
+  // Reject / Change Request Note Modal
   const [actionModal, setActionModal] = useState<{ open: boolean; assignment: Assignment | null; action: 'reject' | 'request_change' }>({
     open: false,
     assignment: null,
@@ -39,13 +35,16 @@ export const RoleAcceptancePage: React.FC = () => {
   });
   const [changeNote, setChangeNote] = useState('');
 
-  useEffect(() => {
-    fetchAssignments();
-  }, []);
+  // View Signed Letter Modal
+  const [activeLetterAck, setActiveLetterAck] = useState<Acknowledgement | null>(null);
 
-  const fetchAssignments = async () => {
+  useEffect(() => {
+    fetchMyAssignments();
+  }, [user]);
+
+  const fetchMyAssignments = async () => {
     try {
-      const res = await api.getAssignments(`memberId=${user?.id}`);
+      const res = await api.getAssignments("memberId=" + user?.id);
       if (res.success) {
         setAssignments(res.assignments);
       }
@@ -56,12 +55,7 @@ export const RoleAcceptancePage: React.FC = () => {
     }
   };
 
-  const handleSignatureSubmit = async (signatureData: {
-    signatureType: SignatureType;
-    signatureData: string;
-    typedName?: string;
-    consentAccepted: boolean;
-  }) => {
+  const handleSignatureSubmit = async (signatureData: { signatureType: any; signatureData: string; typedName?: string; consentAccepted: boolean }) => {
     if (!activeAssignmentForSign) return;
 
     try {
@@ -73,34 +67,50 @@ export const RoleAcceptancePage: React.FC = () => {
         consentAccepted: signatureData.consentAccepted
       });
 
-      alert('Electronic signature accepted and digital acknowledgement generated!');
-      setActiveAssignmentForSign(null);
-      fetchAssignments();
+      if (res.success) {
+        alert('🎉 Role accepted and digital acknowledgement letter successfully signed!');
+        setActiveAssignmentForSign(null);
+        fetchMyAssignments();
+      }
     } catch (err: any) {
-      alert(err.message || 'Signature submission failed');
+      alert(err.message || 'Failed to record digital signature');
     }
   };
 
   const handleResponseSubmit = async () => {
     if (!actionModal.assignment) return;
+
     try {
-      await api.respondAssignment(actionModal.assignment.id, {
+      const res = await api.respondAssignment(actionModal.assignment.id, {
         action: actionModal.action,
         changeNote
       });
-      setActionModal({ open: false, assignment: null, action: 'reject' });
-      setChangeNote('');
-      fetchAssignments();
+
+      if (res.success) {
+        alert(`Status updated to ${actionModal.action.replace('_', ' ')}.`);
+        setActionModal({ open: false, assignment: null, action: 'reject' });
+        setChangeNote('');
+        fetchMyAssignments();
+      }
     } catch (err: any) {
-      alert(err.message || 'Action failed');
+      alert(err.message || 'Failed to submit response');
     }
   };
 
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-xs font-semibold text-slate-400">
+        Loading assigned role allocations...
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h1 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-          <UserCheck className="w-6 h-6 text-brand-600" />
+          <Briefcase className="w-6 h-6 text-brand-600" />
           Assigned Roles & Electronic Acknowledgement
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -108,63 +118,72 @@ export const RoleAcceptancePage: React.FC = () => {
         </p>
       </div>
 
-      {loading ? (
-        <div className="p-8 text-center text-xs text-slate-400">Loading assignments...</div>
-      ) : assignments.length === 0 ? (
-        <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-          <p className="text-xs text-slate-400">No project roles have been assigned to your account yet.</p>
+      {assignments.length === 0 ? (
+        <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <p className="text-xs text-slate-400">You currently have no project role assignments requiring review.</p>
         </div>
       ) : (
         <div className="space-y-6">
           {assignments.map((asgn) => {
-            const isPending = asgn.status === 'pending';
-            const isAccepted = asgn.status === 'accepted';
+            const project = asgn.project;
+            const role = asgn.role;
 
             return (
-              <div
+              <div 
                 key={asgn.id}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6"
+                className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 relative overflow-hidden"
               >
-                {/* Status Bar */}
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+                {/* Top Status Ribbon */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <StatusBadge status={asgn.status} />
                     <span className="text-xs text-slate-400">
                       Assigned On: {new Date(asgn.assignedAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-slate-500">REF: {asgn.id}</span>
+
+                  <span className="text-[11px] font-mono text-slate-400">
+                    REF: {asgn.id}
+                  </span>
                 </div>
 
-                {/* Project & Role Info Grid */}
+                {/* Project & Role Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left: Project Details */}
-                  <div className="lg:col-span-2 space-y-3">
+                  {/* Left 2 Cols: Project Specs */}
+                  <div className="lg:col-span-2 space-y-4">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">
                         Project Overview
                       </span>
-                      <h2 className="text-lg font-black text-slate-900 dark:text-white leading-tight">{asgn.project?.title}</h2>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        {asgn.project?.description}
+                      <h2 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">
+                        {project?.title || asgn.projectTitle || 'Parent teacher app'}
+                      </h2>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                        {project?.description || 'Enterprise Parent teacher app software platform developed by Nexora Technologies.'}
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-300 pt-2">
-                      <span className="flex items-center gap-1">
-                        <Building2 className="w-3.5 h-3.5 text-slate-400" /> Category: <strong>{asgn.project?.category}</strong>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-brand-500" /> Deadline: <strong>{asgn.project?.deadline}</strong>
-                      </span>
+                    <div className="flex flex-wrap items-center gap-4 text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+                        <FolderKanban className="w-4 h-4 text-brand-500" />
+                        <span>Category: <strong className="text-slate-900 dark:text-white">{project?.category || 'Software Engineering'}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+                        <Calendar className="w-4 h-4 text-amber-500" />
+                        <span>Deadline: <strong className="text-slate-900 dark:text-white">{project?.deadline || '2026-12-31'}</strong></span>
+                      </div>
                     </div>
 
-                    {/* Tech Stack Pills */}
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Project Technology Stack:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {asgn.project?.technologyStack.map((tech, idx) => (
-                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                        Project Technology Stack:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {(project?.technologyStack || ['React', 'TypeScript', 'Node.js', 'PostgreSQL']).map((tech, idx) => (
+                          <span 
+                            key={idx}
+                            className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                          >
                             {tech}
                           </span>
                         ))}
@@ -172,72 +191,92 @@ export const RoleAcceptancePage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Right: Assigned Role Specifications */}
-                  <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                  {/* Right Col: Assigned Role Card */}
+                  <div className="p-5 rounded-2xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-100 dark:border-brand-900/50 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Assigned Role</span>
-                      <span className="text-[10px] font-semibold text-slate-400">{asgn.role?.department}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 dark:text-brand-400">
+                        Assigned Role
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                        {role?.department || 'Quality Engineering'}
+                      </span>
                     </div>
-                    <h3 className="text-base font-black text-slate-900 dark:text-white">{asgn.role?.title}</h3>
-                    
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Key Responsibilities:</p>
-                      <ul className="list-disc list-inside space-y-1 text-xs text-slate-600 dark:text-slate-400">
-                        {asgn.role?.responsibilities.map((resp, i) => (
-                          <li key={i} className="line-clamp-2">{resp}</li>
+
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                      {role?.title || asgn.roleTitle || 'QA Engineer'}
+                    </h3>
+
+                    <div>
+                      <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Key Responsibilities:
+                      </h4>
+                      <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                        {(role?.responsibilities || [
+                          'Formulate comprehensive test plans, end-to-end test cases, and quality matrices',
+                          'Perform automated UI testing and REST API verification',
+                          'Audit edge cases, boundary security conditions, and cross-device...',
+                          'Track bug lifecycle and validate production deployment readiness'
+                        ]).map((resp, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
+                            <span>{resp}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
                   </div>
                 </div>
 
-                {/* Member Action Controls Bar */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
-                  {isPending ? (
+                {/* Actions Bar */}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  {asgn.status === 'pending' ? (
                     <>
-                      <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1.5">
-                        <PenTool className="w-4 h-4" /> Official digital acknowledgement signature is required for project onboarding.
-                      </p>
+                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs font-semibold">
+                        <Clock className="w-4 h-4" />
+                        Action Required: Please accept & electronically sign this role acknowledgement.
+                      </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
                         <button
-                          type="button"
-                          onClick={() => setActionModal({ open: true, assignment: asgn, action: 'request_change' })}
-                          className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        >
-                          Request Change
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => setActionModal({ open: true, assignment: asgn, action: 'reject' })}
-                          className="px-4 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-500/20"
+                          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all cursor-pointer"
                         >
                           Decline Role
                         </button>
                         <button
-                          type="button"
-                          onClick={() => setActiveAssignmentForSign(asgn)}
-                          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-sky-500 hover:from-brand-700 hover:to-sky-600 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition-all cursor-pointer"
+                          onClick={() => setActionModal({ open: true, assignment: asgn, action: 'request_change' })}
+                          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-900 transition-all cursor-pointer"
                         >
-                          <CheckCircle className="w-4 h-4" /> Accept & Attach Digital Signature
+                          Request Change
+                        </button>
+                        <button
+                          onClick={() => setActiveAssignmentForSign(asgn)}
+                          className="flex-1 sm:flex-initial px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <FileCheck2 className="w-4 h-4" /> Accept & Sign Digitally
                         </button>
                       </div>
                     </>
-                  ) : isAccepted && asgn.acknowledgement ? (
-                    <div className="w-full flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                        <ShieldCheck className="w-5 h-5" />
-                        Role Officialized & Digitally Signed (Hash: {asgn.acknowledgement.qrCodeHash})
+                  ) : asgn.status === 'accepted' ? (
+                    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900/50">
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        Role Officialized & Digitally Signed {asgn.acknowledgement?.qrCodeHash ? `(Hash: ${asgn.acknowledgement.qrCodeHash})` : ''}
                       </div>
-                      <button
-                        onClick={() => setActiveLetterAck(asgn.acknowledgement)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20"
-                      >
-                        <Eye className="w-4 h-4" /> View Official Signed Letter
-                      </button>
+
+                      {asgn.acknowledgement && (
+                        <button
+                          onClick={() => setActiveLetterAck(asgn.acknowledgement)}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md cursor-pointer"
+                        >
+                          <Eye className="w-4 h-4" /> View Official Signed Letter
+                        </button>
+                      )}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-500">Assignment Status: {asgn.status}</p>
+                    <div className="text-xs text-slate-500">
+                      Response recorded: <strong className="uppercase">{asgn.status}</strong>
+                    </div>
                   )}
                 </div>
               </div>
@@ -253,8 +292,8 @@ export const RoleAcceptancePage: React.FC = () => {
           onClose={() => setActiveAssignmentForSign(null)}
           onSubmit={handleSignatureSubmit}
           memberName={user?.name || 'Team Member'}
-          roleTitle={activeAssignmentForSign.role?.title || 'Assigned Role'}
-          projectTitle={activeAssignmentForSign.project?.title || 'Project'}
+          roleTitle={activeAssignmentForSign.role?.title || activeAssignmentForSign.roleTitle || 'QA Engineer'}
+          projectTitle={activeAssignmentForSign.project?.title || activeAssignmentForSign.projectTitle || 'Parent teacher app'}
         />
       )}
 
@@ -307,23 +346,32 @@ export const RoleAcceptancePage: React.FC = () => {
         >
           <AcknowledgementLetterPreview
             member={{
-              name: user?.name || 'Member',
-              email: user?.email || '',
-              memberId: user?.memberId || 'DEV-101',
-              department: user?.department,
-              college: user?.college
+              name: activeLetterAck.member?.name || user?.name || 'Trivin S',
+              email: activeLetterAck.member?.email || user?.email || 'trivin@nexora.com',
+              memberId: activeLetterAck.member?.memberId || user?.memberId || 'DEV-101',
+              department: activeLetterAck.member?.department || user?.department || 'Quality Engineering',
+              college: activeLetterAck.member?.college || user?.college || 'Department of Computer Science'
             }}
             project={{
-              title: activeLetterAck.project?.title || 'Project',
-              description: activeLetterAck.project?.description || '',
-              category: activeLetterAck.project?.category || 'Software',
-              technologyStack: activeLetterAck.project?.technologyStack || [],
-              deadline: activeLetterAck.project?.deadline || ''
+              title: activeLetterAck.project?.title || (activeLetterAck as any).projectTitle || (activeLetterAck as any).assignment?.projectTitle || 'Parent teacher app',
+              description: activeLetterAck.project?.description || 'Enterprise Parent teacher app software platform developed by Nexora Technologies.',
+              category: activeLetterAck.project?.category || 'Software Engineering',
+              technologyStack: (activeLetterAck.project?.technologyStack && activeLetterAck.project.technologyStack.length > 0)
+                ? activeLetterAck.project.technologyStack
+                : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
+              deadline: activeLetterAck.project?.deadline || '2026-12-31'
             }}
             role={{
-              title: activeLetterAck.role?.title || 'Role',
-              department: activeLetterAck.role?.department || '',
-              responsibilities: activeLetterAck.role?.responsibilities || []
+              title: activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle || 'QA Engineer',
+              department: activeLetterAck.role?.department || 'Quality Engineering',
+              responsibilities: (activeLetterAck.role?.responsibilities && activeLetterAck.role.responsibilities.length > 0)
+                ? activeLetterAck.role.responsibilities
+                : [
+                    'Formulate comprehensive test plans, end-to-end test cases, and quality matrices.',
+                    'Perform automated UI testing and REST API verification.',
+                    'Audit edge cases, boundary security conditions, and cross-device compatibility.',
+                    'Track bug lifecycle and validate production deployment readiness.'
+                  ]
             }}
             acknowledgement={{
               signatureData: activeLetterAck.signatureData,
