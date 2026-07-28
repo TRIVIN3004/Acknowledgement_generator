@@ -198,12 +198,12 @@ export const RoleAcceptancePage: React.FC = () => {
                         Assigned Role
                       </span>
                       <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        {role?.department || 'Quality Engineering'}
+                        {role?.department || user?.department || 'Software Engineering'}
                       </span>
                     </div>
 
                     <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                      {role?.title || asgn.roleTitle || 'QA Engineer'}
+                      {role?.title || asgn.roleTitle || 'Software Engineer'}
                     </h3>
 
                     <div>
@@ -211,11 +211,10 @@ export const RoleAcceptancePage: React.FC = () => {
                         Key Responsibilities:
                       </h4>
                       <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-                        {(role?.responsibilities || [
-                          'Formulate comprehensive test plans, end-to-end test cases, and quality matrices',
-                          'Perform automated UI testing and REST API verification',
-                          'Audit edge cases, boundary security conditions, and cross-device...',
-                          'Track bug lifecycle and validate production deployment readiness'
+                        {(role?.responsibilities && role.responsibilities.length > 0 ? role.responsibilities : [
+                          'Develop and implement technical features and project modules.',
+                          'Collaborate with project leads and cross-functional team members.',
+                          'Maintain clean code principles and digital signature verification compliance.'
                         ]).map((resp, i) => (
                           <li key={i} className="flex items-start gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
@@ -292,8 +291,8 @@ export const RoleAcceptancePage: React.FC = () => {
           onClose={() => setActiveAssignmentForSign(null)}
           onSubmit={handleSignatureSubmit}
           memberName={user?.name || 'Team Member'}
-          roleTitle={activeAssignmentForSign.role?.title || activeAssignmentForSign.roleTitle || 'QA Engineer'}
-          projectTitle={activeAssignmentForSign.project?.title || activeAssignmentForSign.projectTitle || 'Parent teacher app'}
+          roleTitle={activeAssignmentForSign.role?.title || activeAssignmentForSign.roleTitle || 'Software Engineer'}
+          projectTitle={activeAssignmentForSign.project?.title || activeAssignmentForSign.projectTitle || 'Nexora Project'}
         />
       )}
 
@@ -346,15 +345,15 @@ export const RoleAcceptancePage: React.FC = () => {
         >
           <AcknowledgementLetterPreview
             member={{
-              name: activeLetterAck.member?.name || user?.name || 'Trivin S',
-              email: activeLetterAck.member?.email || user?.email || 'trivin@nexora.com',
+              name: activeLetterAck.member?.name || user?.name || 'Team Member',
+              email: activeLetterAck.member?.email || user?.email || 'member@nexora.com',
               memberId: activeLetterAck.member?.memberId || user?.memberId || 'DEV-101',
-              department: activeLetterAck.member?.department || user?.department || 'Quality Engineering',
+              department: activeLetterAck.member?.department || user?.department || 'Software Engineering',
               college: activeLetterAck.member?.college || user?.college || 'Department of Computer Science'
             }}
             project={{
-              title: activeLetterAck.project?.title || (activeLetterAck as any).projectTitle || (activeLetterAck as any).assignment?.projectTitle || 'Parent teacher app',
-              description: activeLetterAck.project?.description || 'Enterprise Parent teacher app software platform developed by Nexora Technologies.',
+              title: activeLetterAck.project?.title || (activeLetterAck as any).projectTitle || (activeLetterAck as any).assignment?.projectTitle || 'Nexora Project',
+              description: activeLetterAck.project?.description || 'Enterprise software initiative developed by Nexora Technologies.',
               category: activeLetterAck.project?.category || 'Software Engineering',
               technologyStack: (activeLetterAck.project?.technologyStack && activeLetterAck.project.technologyStack.length > 0)
                 ? activeLetterAck.project.technologyStack
@@ -362,15 +361,14 @@ export const RoleAcceptancePage: React.FC = () => {
               deadline: activeLetterAck.project?.deadline || '2026-12-31'
             }}
             role={{
-              title: activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle || 'QA Engineer',
-              department: activeLetterAck.role?.department || 'Quality Engineering',
+              title: activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle || 'Software Engineer',
+              department: activeLetterAck.role?.department || activeLetterAck.member?.department || user?.department || 'Software Engineering',
               responsibilities: (activeLetterAck.role?.responsibilities && activeLetterAck.role.responsibilities.length > 0)
                 ? activeLetterAck.role.responsibilities
                 : [
-                    'Formulate comprehensive test plans, end-to-end test cases, and quality matrices.',
-                    'Perform automated UI testing and REST API verification.',
-                    'Audit edge cases, boundary security conditions, and cross-device compatibility.',
-                    'Track bug lifecycle and validate production deployment readiness.'
+                    'Develop, test, and deliver modular application features.',
+                    'Collaborate with project leads and cross-functional engineering team members.',
+                    'Maintain clean code principles and digital signature verification compliance.'
                   ]
             }}
             acknowledgement={{

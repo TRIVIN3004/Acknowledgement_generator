@@ -61,10 +61,10 @@ export const MyLettersPage: React.FC = () => {
 
                 <div>
                   <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                    {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Parent teacher app'}
+                    {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Nexora Project'}
                   </h3>
                   <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-                    Role: {ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || 'QA Engineer'}
+                    Role: {ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || 'Software Engineer'}
                   </p>
                 </div>
 
@@ -113,15 +113,15 @@ export const MyLettersPage: React.FC = () => {
         >
           <AcknowledgementLetterPreview
             member={{
-              name: selectedAck.member?.name || user?.name || 'Trivin S',
-              email: selectedAck.member?.email || user?.email || 'trivin@nexora.com',
+              name: selectedAck.member?.name || user?.name || 'Team Member',
+              email: selectedAck.member?.email || user?.email || 'member@nexora.com',
               memberId: selectedAck.member?.memberId || user?.memberId || 'DEV-101',
-              department: selectedAck.member?.department || user?.department || 'Quality Engineering',
+              department: selectedAck.member?.department || user?.department || 'Software Engineering',
               college: selectedAck.member?.college || user?.college || 'Department of Computer Science'
             }}
             project={{
-              title: selectedAck.project?.title || (selectedAck as any).projectTitle || (selectedAck as any).assignment?.projectTitle || 'Parent teacher app',
-              description: selectedAck.project?.description || 'Enterprise Parent teacher app software platform developed by Nexora Technologies.',
+              title: selectedAck.project?.title || (selectedAck as any).projectTitle || (selectedAck as any).assignment?.projectTitle || 'Nexora Project',
+              description: selectedAck.project?.description || 'Enterprise software platform developed by Nexora Technologies.',
               category: selectedAck.project?.category || 'Software Engineering',
               technologyStack: (selectedAck.project?.technologyStack && selectedAck.project.technologyStack.length > 0)
                 ? selectedAck.project.technologyStack
@@ -129,15 +129,14 @@ export const MyLettersPage: React.FC = () => {
               deadline: selectedAck.project?.deadline || '2026-12-31'
             }}
             role={{
-              title: selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle || 'QA Engineer',
-              department: selectedAck.role?.department || 'Quality Engineering',
+              title: selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle || 'Software Engineer',
+              department: selectedAck.role?.department || selectedAck.member?.department || user?.department || 'Software Engineering',
               responsibilities: (selectedAck.role?.responsibilities && selectedAck.role.responsibilities.length > 0)
                 ? selectedAck.role.responsibilities
                 : [
-                    'Formulate comprehensive test plans, end-to-end test cases, and quality matrices.',
-                    'Perform automated UI testing and REST API verification.',
-                    'Audit edge cases, boundary security conditions, and cross-device compatibility.',
-                    'Track bug lifecycle and validate production deployment readiness.'
+                    'Develop, test, and deliver modular application features.',
+                    'Collaborate with project leads and cross-functional engineering team members.',
+                    'Maintain clean code principles and digital signature verification compliance.'
                   ]
             }}
             acknowledgement={{
