@@ -69,7 +69,7 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`PRDAMS_Acknowledgement_${member.name.replace(/\s+/g, '_')}_${role.title.replace(/\s+/g, '_')}.pdf`);
+      pdf.save(`PRDAMS_Acknowledgement_${(member?.name || 'Member').replace(/\s+/g, '_')}_${(role?.title || 'Role').replace(/\s+/g, '_')}.pdf`);
     } catch (error) {
       console.error('PDF Generation failed, invoking print fallback:', error);
       window.print();
@@ -77,6 +77,18 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
   };
 
   const qrVerificationUrl = `${window.location.origin}/verify/${acknowledgement.qrCodeHash}`;
+
+  const techStack = (project?.technologyStack && project.technologyStack.length > 0)
+    ? project.technologyStack
+    : ['React', 'TypeScript', 'Node.js', 'Python', 'Tailwind CSS'];
+
+  const responsibilitiesList = (role?.responsibilities && role.responsibilities.length > 0)
+    ? role.responsibilities
+    : [
+        'Develop, test, and deploy modular application features.',
+        'Collaborate with cross-functional engineering leads to meet milestones.',
+        'Maintain clean code principles and digital signature verification compliance.'
+      ];
 
   return (
     <div className="space-y-4">
@@ -146,39 +158,39 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
               <Building2 className="w-4 h-4 text-brand-600" /> Member Allocation Data
             </h3>
             <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-slate-700">
-              <div><strong className="text-slate-900">Member Name:</strong> {member.name}</div>
-              <div><strong className="text-slate-900">Member ID:</strong> {member.memberId || 'DEV-101'}</div>
-              <div><strong className="text-slate-900">Email Address:</strong> {member.email}</div>
-              <div><strong className="text-slate-900">Department:</strong> {member.department || 'Software Engineering'}</div>
-              <div className="col-span-2"><strong className="text-slate-900">Institution / College:</strong> {member.college || 'Department of Computer Science'}</div>
+              <div><strong className="text-slate-900">Member Name:</strong> {member?.name || acknowledgement?.typedName || 'Team Member'}</div>
+              <div><strong className="text-slate-900">Member ID:</strong> {member?.memberId || 'DEV-101'}</div>
+              <div><strong className="text-slate-900">Email Address:</strong> {member?.email || 'member@nexora.com'}</div>
+              <div><strong className="text-slate-900">Department:</strong> {member?.department || 'Software Engineering'}</div>
+              <div className="col-span-2"><strong className="text-slate-900">Institution / College:</strong> {member?.college || 'Department of Computer Science'}</div>
             </div>
           </div>
 
           {/* Project & Role Specifications */}
           <div className="space-y-4 mb-6 text-xs text-slate-800">
             <div className="border-l-4 border-brand-600 pl-4 py-1">
-              <h4 className="font-bold text-slate-900 text-sm">Project: {project.title}</h4>
-              <p className="text-slate-600 mt-1">{project.description}</p>
+              <h4 className="font-bold text-slate-900 text-sm">Project: {project?.title || 'Nexora AI Copilot Platform'}</h4>
+              <p className="text-slate-600 mt-1">{project?.description || 'Enterprise AI software initiative integrating context-aware codebase intelligence.'}</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 <span className="bg-brand-50 text-brand-800 px-2 py-0.5 rounded font-semibold text-[10px]">
-                  Category: {project.category}
+                  Category: {project?.category || 'Software Engineering'}
                 </span>
                 <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold text-[10px]">
-                  Deadline: {project.deadline}
+                  Deadline: {project?.deadline || '2026-12-31'}
                 </span>
               </div>
             </div>
 
             <div className="bg-brand-50/50 border border-brand-100 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-bold text-brand-900 text-sm">Assigned Role: {role.title}</h4>
+                <h4 className="font-bold text-brand-900 text-sm">Assigned Role: {role?.title || 'Software Engineer'}</h4>
                 <span className="text-[10px] font-bold text-brand-700 uppercase bg-white px-2 py-0.5 rounded border border-brand-200">
-                  {role.department}
+                  {role?.department || 'Engineering'}
                 </span>
               </div>
               <p className="font-bold text-slate-900 text-[11px] mb-1">Key Responsibilities & Deliverables:</p>
               <ul className="list-disc list-inside space-y-1 text-slate-700 text-[11px] pl-1">
-                {role.responsibilities.map((resp, i) => (
+                {responsibilitiesList.map((resp, i) => (
                   <li key={i} className="leading-relaxed">{resp}</li>
                 ))}
               </ul>
@@ -189,7 +201,7 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
           <div className="mb-6 text-xs">
             <p className="font-bold text-slate-900 text-[11px] mb-1">Target Technology Stack:</p>
             <div className="flex flex-wrap gap-1.5">
-              {project.technologyStack.map((tech, idx) => (
+              {techStack.map((tech, idx) => (
                 <span key={idx} className="bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-semibold">
                   {tech}
                 </span>
@@ -206,7 +218,7 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
                 <div className="my-2 min-h-[45px] flex items-center">
                   <img src={acknowledgement.signatureData} alt="Digital Signature" className="max-h-12 object-contain" />
                 </div>
-                <p className="font-bold text-slate-900 text-[11px]">{member.name}</p>
+                <p className="font-bold text-slate-900 text-[11px]">{member?.name || acknowledgement.typedName || 'Signatory'}</p>
                 <p className="text-[9px] text-slate-500">Date: {new Date(acknowledgement.timestamp).toLocaleDateString()}</p>
                 <p className="text-[9px] text-slate-400 font-mono">IP: {acknowledgement.ipAddress}</p>
               </div>
