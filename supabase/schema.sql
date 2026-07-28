@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ENABLE ROW LEVEL SECURITY (RLS) & PUBLIC READ ACCESS
+-- ENABLE ROW LEVEL SECURITY (RLS) & OPEN PERMISSIONS
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
@@ -117,7 +117,11 @@ ALTER TABLE acknowledgements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Allow read/write for authenticated app client
-CREATE POLICY "Allow public read access to projects" ON projects FOR SELECT USING (true);
-CREATE POLICY "Allow public read access to roles" ON roles FOR SELECT USING (true);
-CREATE POLICY "Allow public read access to acknowledgements" ON acknowledgements FOR SELECT USING (true);
+-- Allow full read/write access for application API queries
+CREATE POLICY "Allow full access to users" ON users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to projects" ON projects FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to roles" ON roles FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to assignments" ON assignments FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to acknowledgements" ON acknowledgements FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to notifications" ON notifications FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow full access to audit_logs" ON audit_logs FOR ALL USING (true) WITH CHECK (true);

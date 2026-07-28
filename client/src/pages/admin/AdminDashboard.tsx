@@ -14,7 +14,10 @@ import {
   ShieldCheck,
   Database,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Search,
+  Eye,
+  UserCheck
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -29,7 +32,7 @@ import {
   Cell 
 } from 'recharts';
 import { api, apiRequest } from '../../services/api';
-import { AdminDashboardStats } from '../../types';
+import { AdminDashboardStats, Assignment } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Modal } from '../../components/common/Modal';
 
@@ -39,6 +42,13 @@ export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Role Allocations Modal State
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [isAssignmentsModalOpen, setIsAssignmentsModalOpen] = useState(false);
+  const [assignmentFilter, setAssignmentFilter] = useState<string>('all');
+  const [assignmentSearch, setAssignmentSearch] = useState('');
+  const [loadingAssignments, setLoadingAssignments] = useState(false);
+
   // CSV Import State
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
   const [csvContent, setCSVContent] = useState('');
@@ -47,7 +57,42 @@ export const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchStats();
+    fetchAssignments();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.getAdminStats();
+      if (res.success) {
+        setStats(res.stats);
+      }
+    } catch (e) {
+      console.error('Failed to fetch admin stats:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAssignments = async () => {
+    setLoadingAssignments(true);
+    try {
+      const res = await api.getAssignments();
+      if (res.success) {
+        setAssignments(res.assignments);
+      }
+    } catch (e) {
+      console.error('Failed to fetch assignments:', e);
+    } finally {
+      setLoadingAssignments(false);
+    }
+  };
+
+  const handleOpenAssignmentsModal = (filter: string = 'all') => {
+    setAssignmentFilter(filter);
+    setAssignmentSearch('');
+    fetchAssignments();
+    setIsAssignmentsModalOpen(true);
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,6 +121,7 @@ export const AdminDashboard: React.FC = () => {
       setIsCSVModalOpen(false);
       setCSVContent('');
       fetchStats();
+      fetchAssignments();
     } catch (err: any) {
       alert(err.message || 'CSV Import failed');
     } finally {
@@ -83,18 +129,17 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const res = await api.getAdminStats();
-      if (res.success) {
-        setStats(res.stats);
-      }
-    } catch (e) {
-      console.error('Failed to fetch admin stats:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredAssignments = assignments.filter(a => {
+    const matchesFilter = assignmentFilter === 'all' || a.status === assignmentFilter;
+    const q = assignmentSearch.toLowerCase();
+    const matchesSearch = !q || 
+      (a.memberName && a.memberName.toLowerCase().includes(q)) ||
+      (a.memberEmail && a.memberEmail.toLowerCase().includes(q)) ||
+      (a.projectTitle && a.projectTitle.toLowerCase().includes(q)) ||
+      (a.roleTitle && a.roleTitle.toLowerCase().includes(q));
+
+    return matchesFilter && matchesSearch;
+  });
 
   if (loading) {
     return (
@@ -118,6 +163,12 @@ export const AdminDashboard: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
+            onClick={() => handleOpenAssignmentsModal('all')}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-brand-700 text-xs font-bold shadow-md hover:bg-brand-50 transition-all cursor-pointer"
+          >
+            <UserCheck className="w-4 h-4 text-brand-600" /> View Role Allocations
+          </button>
+          <button
             onClick={() => setIsCSVModalOpen(true)}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
           >
@@ -125,7 +176,7 @@ export const AdminDashboard: React.FC = () => {
           </button>
           <Link
             to="/admin/projects"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-brand-700 text-xs font-bold shadow-md hover:bg-brand-50 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-800/60 hover:bg-brand-800 text-white text-xs font-bold backdrop-blur-md transition-all"
           >
             <Plus className="w-4 h-4" /> New Project
           </Link>
@@ -135,86 +186,103 @@ export const AdminDashboard: React.FC = () => {
           >
             <Briefcase className="w-4 h-4" /> New Role
           </Link>
-          <Link
-            to="/admin/acknowledgements"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-800/60 hover:bg-brand-800 text-white text-xs font-bold backdrop-blur-md transition-all"
-          >
-            <Download className="w-4 h-4" /> Export CSV/ZIP
-          </Link>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
+      {/* KPI Cards Grid (Clickable) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Projects */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('all')}
+          className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition-all space-y-3 group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Projects</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-brand-600">Total Projects</span>
             <div className="p-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400">
               <FolderKanban className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{stats?.totalProjects || 0}</span>
-            <span className="text-[11px] font-semibold text-emerald-500 flex items-center">
-              <TrendingUp className="w-3 h-3 mr-0.5" /> Active
+            <span className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 flex items-center">
+              View Allocations <ArrowRight className="w-3 h-3 ml-1" />
             </span>
           </div>
         </div>
 
         {/* Total Members */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('all')}
+          className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/50 cursor-pointer transition-all space-y-3 group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Team Members</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600">Team Members</span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
               <Users className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{stats?.totalMembers || 0}</span>
-            <span className="text-[11px] font-semibold text-slate-400">Allocated Roster</span>
+            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center">
+              View Roster <ArrowRight className="w-3 h-3 ml-1" />
+            </span>
           </div>
         </div>
 
         {/* Total Roles */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('all')}
+          className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-500/50 cursor-pointer transition-all space-y-3 group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Role Catalog</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-purple-600">Role Catalog</span>
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
               <Briefcase className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{stats?.totalRoles || 0}</span>
-            <span className="text-[11px] font-semibold text-purple-500">Definitions</span>
+            <span className="text-[11px] font-semibold text-purple-500 flex items-center">
+              Definitions <ArrowRight className="w-3 h-3 ml-1" />
+            </span>
           </div>
         </div>
 
         {/* Pending Acknowledgements */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('pending')}
+          className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-amber-500/50 cursor-pointer transition-all space-y-3 group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Acceptance</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600">Pending Acceptance</span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
               <Clock className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-amber-600 dark:text-amber-400">{stats?.pendingAcknowledgements || 0}</span>
-            <span className="text-[11px] font-semibold text-amber-500">Awaiting Sign</span>
+            <span className="text-[11px] font-semibold text-amber-500 flex items-center">
+              Awaiting Sign <ArrowRight className="w-3 h-3 ml-1" />
+            </span>
           </div>
         </div>
 
         {/* Completed Digital Acknowledgements */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('accepted')}
+          className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/50 cursor-pointer transition-all space-y-3 group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Signed Letters</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-sky-600">Signed Letters</span>
             <div className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
               <FileCheck2 className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{stats?.completedAcknowledgements || 0}</span>
-            <span className="text-[11px] font-semibold text-emerald-500 font-bold">{stats?.acceptanceRate}% Rate</span>
+            <span className="text-[11px] font-semibold text-sky-500 flex items-center">
+              View Signed <ArrowRight className="w-3 h-3 ml-1" />
+            </span>
           </div>
         </div>
       </div>
@@ -222,11 +290,14 @@ export const AdminDashboard: React.FC = () => {
       {/* Analytics Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Members Per Project Bar Chart */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('all')}
+          className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-brand-500/40 cursor-pointer transition-all space-y-4"
+        >
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Members Allocated Per Project</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Team distribution across active project initiatives</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Click to view detailed member role allocations</p>
             </div>
             <Activity className="w-5 h-5 text-brand-500" />
           </div>
@@ -247,11 +318,14 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Role Distribution Pie Chart */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div 
+          onClick={() => handleOpenAssignmentsModal('all')}
+          className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-500/40 cursor-pointer transition-all space-y-4"
+        >
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Role Distribution Share</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Popularity breakdown of technical roles assigned</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Click to view which role is assigned to which person</p>
             </div>
             <Briefcase className="w-5 h-5 text-emerald-500" />
           </div>
@@ -312,6 +386,115 @@ export const AdminDashboard: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Role Allocations Matrix Modal */}
+      <Modal
+        isOpen={isAssignmentsModalOpen}
+        onClose={() => setIsAssignmentsModalOpen(false)}
+        title="Project Role Allocation Matrix"
+        subtitle="Detailed breakdown showing which technical role is assigned to which person across all projects."
+        maxWidth="4xl"
+      >
+        <div className="space-y-4">
+          {/* Controls: Search & Filter Tabs */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="relative flex-1 w-full">
+              <input
+                type="text"
+                placeholder="Filter by member name, email, project, or role title..."
+                value={assignmentSearch}
+                onChange={(e) => setAssignmentSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            </div>
+
+            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+              {['all', 'pending', 'accepted', 'rejected', 'change_requested'].map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setAssignmentFilter(st)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${
+                    assignmentFilter === st
+                      ? 'bg-brand-600 text-white shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {st.replace('_', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Allocation Table */}
+          <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
+            <div className="overflow-x-auto max-h-[450px]">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100 dark:bg-slate-800 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3">Team Member</th>
+                    <th className="px-4 py-3">Assigned Role</th>
+                    <th className="px-4 py-3">Target Project</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-right">Assigned Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200/60 dark:divide-slate-700/60">
+                  {loadingAssignments ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-slate-400">Loading role allocations...</td>
+                    </tr>
+                  ) : filteredAssignments.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-slate-400">No role assignments match the current filter.</td>
+                    </tr>
+                  ) : (
+                    filteredAssignments.map((asgn) => (
+                      <tr key={asgn.id} className="hover:bg-white dark:hover:bg-slate-800 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <img
+                              src={asgn.member?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(asgn.memberName || 'Member')}`}
+                              alt={asgn.memberName}
+                              className="w-7 h-7 rounded-lg object-cover ring-2 ring-brand-500/20"
+                            />
+                            <div>
+                              <p className="font-bold text-slate-900 dark:text-white">{asgn.memberName || 'Team Member'}</p>
+                              <p className="text-[10px] text-slate-400">{asgn.memberEmail || asgn.member?.email}</p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <div>
+                            <p className="font-bold text-brand-600 dark:text-brand-400">{asgn.roleTitle || asgn.role?.title || 'Assigned Role'}</p>
+                            <p className="text-[10px] text-slate-400">{asgn.role?.department || 'Engineering'}</p>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white">{asgn.projectTitle || asgn.project?.title || 'Project'}</p>
+                            <span className="text-[10px] font-semibold text-slate-400">{asgn.project?.category || 'Software'}</span>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <StatusBadge status={asgn.status} />
+                        </td>
+
+                        <td className="px-4 py-3 text-right font-mono text-[11px] text-slate-500">
+                          {new Date(asgn.assignedAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       {/* CSV File Import Modal */}
       <Modal
