@@ -146,7 +146,7 @@ export function parseUsersCsv() {
       roleId,
       memberId: pair.userId,
       assignedBy: 'EMP-001',
-      status: idx % 3 === 0 ? 'accepted' : 'pending',
+      status: 'pending',
       assignedAt: '2026-02-10T10:00:00.000Z'
     };
   });
