@@ -33,7 +33,7 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
 
             const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
             if (idx !== -1) {
-              memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
+              memoryStore.projects[idx] = { ...formatted, ...memoryStore.projects[idx] };
             } else {
               memoryStore.projects.unshift(formatted);
             }
@@ -214,7 +214,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response) =>
           lead_name: project.leadName,
           timeline_started_at: project.timeline?.startedAt,
           timeline_completed_at: project.timeline?.completedAt
-        }).match({ id: project.id });
+        }).or(`id.eq.${project.id},title.eq.${project.title}`);
       } catch (err) {
         console.warn('Supabase updateProject error:', err);
       }
