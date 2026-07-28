@@ -1,9 +1,49 @@
 import { Response } from 'express';
 import { memoryStore } from '../config/db.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
+import { supabase } from '../config/supabase.js';
 
 export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // If Supabase DB is connected, fetch latest projects into memoryStore
+    if (supabase) {
+      try {
+        const { data: supaProjects } = await supabase.from('projects').select('*');
+        if (supaProjects && Array.isArray(supaProjects)) {
+          supaProjects.forEach((p: any) => {
+            const formatted = {
+              id: p.id,
+              _id: p.id,
+              title: p.title,
+              description: p.description,
+              category: p.category || 'Enterprise Web Application',
+              technologyStack: Array.isArray(p.technology_stack) ? p.technology_stack : (Array.isArray(p.tech_stack) ? p.tech_stack : ['React', 'TypeScript']),
+              leadId: p.lead_id || 'usr-admin-1',
+              leadName: p.lead_name || 'Project Lead',
+              deadline: p.deadline || '2026-12-31',
+              status: p.status || 'planning',
+              timeline: {
+                assignedAt: p.timeline_assigned_at || p.created_at || new Date().toISOString(),
+                acceptedAt: p.timeline_accepted_at,
+                startedAt: p.timeline_started_at,
+                completedAt: p.timeline_completed_at
+              },
+              createdAt: p.created_at || new Date().toISOString()
+            };
+
+            const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
+            if (idx !== -1) {
+              memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
+            } else {
+              memoryStore.projects.unshift(formatted);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase getProjects sync warning:', err);
+      }
+    }
+
     const { status, category, search } = req.query;
     let list = [...memoryStore.projects];
 
@@ -69,14 +109,14 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
       ? technologyStack 
       : (technologyStack ? technologyStack.split(',').map((t: string) => t.trim()) : []);
 
-    const newProject = {
+    const newProject: any = {
       id: `proj-${Date.now()}`,
       _id: `proj-${Date.now()}`,
       title,
       description,
       category: category || 'Enterprise Web Application',
       technologyStack: techArray,
-      leadId: leadId || req.user?.id,
+      leadId: leadId || req.user?.id || 'usr-admin-1',
       leadName: leadName || req.user?.name || 'Project Admin',
       deadline,
       status: 'planning',
@@ -85,6 +125,30 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
       },
       createdAt: new Date().toISOString()
     };
+
+    if (supabase) {
+      try {
+        const { data: supaData, error } = await supabase.from('projects').insert([{
+          title: newProject.title,
+          description: newProject.description,
+          category: newProject.category,
+          technology_stack: newProject.technologyStack,
+          lead_name: newProject.leadName,
+          deadline: newProject.deadline,
+          status: newProject.status,
+          timeline_assigned_at: newProject.timeline.assignedAt
+        }]).select();
+
+        if (!error && supaData && supaData[0]) {
+          newProject.id = supaData[0].id;
+          newProject._id = supaData[0].id;
+        } else if (error) {
+          console.warn('Supabase project insert notice:', error.message);
+        }
+      } catch (err) {
+        console.warn('Supabase project insert fallback:', err);
+      }
+    }
 
     memoryStore.projects.unshift(newProject);
 
@@ -138,6 +202,24 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response) =>
       }
     }
 
+    if (supabase) {
+      try {
+        await supabase.from('projects').update({
+          title: project.title,
+          description: project.description,
+          category: project.category,
+          technology_stack: project.technologyStack,
+          deadline: project.deadline,
+          status: project.status,
+          lead_name: project.leadName,
+          timeline_started_at: project.timeline?.startedAt,
+          timeline_completed_at: project.timeline?.completedAt
+        }).match({ id: project.id });
+      } catch (err) {
+        console.warn('Supabase updateProject error:', err);
+      }
+    }
+
     memoryStore.auditLogs.unshift({
       id: `log-${Date.now()}`,
       action: 'PROJECT_UPDATED',
@@ -167,6 +249,14 @@ export const archiveProject = async (req: AuthenticatedRequest, res: Response) =
 
     project.status = 'archived';
 
+    if (supabase) {
+      try {
+        await supabase.from('projects').update({ status: 'archived' }).match({ id: project.id });
+      } catch (err) {
+        console.warn('Supabase archiveProject error:', err);
+      }
+    }
+
     memoryStore.auditLogs.unshift({
       id: `log-${Date.now()}`,
       action: 'PROJECT_ARCHIVED',
@@ -195,6 +285,14 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response) =>
     }
 
     const deleted = memoryStore.projects.splice(idx, 1)[0];
+
+    if (supabase) {
+      try {
+        await supabase.from('projects').delete().match({ id: id });
+      } catch (err) {
+        console.warn('Supabase deleteProject error:', err);
+      }
+    }
 
     memoryStore.auditLogs.unshift({
       id: `log-${Date.now()}`,
