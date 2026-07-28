@@ -1,0 +1,1045 @@
+{
+  "users": [
+    {
+      "id": "EMP-0001",
+      "_id": "EMP-0001",
+      "name": "TRIVIN S",
+      "email": "trivin@nexora.com",
+      "passwordHash": "Trivin@123",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+919344048472",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-0001",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-001",
+      "_id": "EMP-001",
+      "name": "Trivin",
+      "email": "testing@nexora.com",
+      "passwordHash": "Trivin@123",
+      "role": "admin",
+      "department": "Management",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-2834",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-001",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-002",
+      "_id": "EMP-002",
+      "name": "Aakashraj",
+      "email": "aakashraj@nexora.com",
+      "passwordHash": "Akash0709",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "9445360088",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-002",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-003",
+      "_id": "EMP-003",
+      "name": "Gopika",
+      "email": "gopika@nexora.com",
+      "passwordHash": "Gopika@123",
+      "role": "member",
+      "department": "Design",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-9481",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-003",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-004",
+      "_id": "EMP-004",
+      "name": "Akshaya",
+      "email": "akshaya@nexora.com",
+      "passwordHash": "Ashraj@2005",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-3382",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-004",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-005",
+      "_id": "EMP-005",
+      "name": "Amirtha",
+      "email": "amirtha@nexora.com",
+      "passwordHash": "Amy@2205",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-7482",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-005",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-006",
+      "_id": "EMP-006",
+      "name": "Pavithraa",
+      "email": "pavithraa@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Quality Assurance",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-2910",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-006",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-007",
+      "_id": "EMP-007",
+      "name": "Sujitha",
+      "email": "sujitha@nexora.com",
+      "passwordHash": "suji.sk9m",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-8739",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-007",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-008",
+      "_id": "EMP-008",
+      "name": "Sangamithra",
+      "email": "sangamithra@nexora.com",
+      "passwordHash": "Mithra@05$",
+      "role": "member",
+      "department": "Design",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-1144",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-008",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-010",
+      "_id": "EMP-010",
+      "name": "Aaryan",
+      "email": "aaryan@nexora.com",
+      "passwordHash": "qwerty",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-7431",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-010",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-011",
+      "_id": "EMP-011",
+      "name": "Ajay kumar D",
+      "email": "ajaykumar@nexora.com",
+      "passwordHash": "Ajaynexora@",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "8072753848",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-011",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-012",
+      "_id": "EMP-012",
+      "name": "Pathmavathi",
+      "email": "pathmavathi@nexora.com",
+      "passwordHash": "Pathmavathi@123",
+      "role": "member",
+      "department": "Management",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-1229",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-012",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-013",
+      "_id": "EMP-013",
+      "name": "Pooja",
+      "email": "pooja@nexora.com",
+      "passwordHash": "12345678",
+      "role": "member",
+      "department": "Design",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-4820",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-013",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-014",
+      "_id": "EMP-014",
+      "name": "Aarathana",
+      "email": "aarathana@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-3349",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-014",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-015",
+      "_id": "EMP-015",
+      "name": "Gokulashri",
+      "email": "gokulashri@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-2283",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-015",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-016",
+      "_id": "EMP-016",
+      "name": "Karthikeyan",
+      "email": "karthikeyan@nexora.com",
+      "passwordHash": "karthi2606",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-2248",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-016",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-018",
+      "_id": "EMP-018",
+      "name": "Sanjay Kumar",
+      "email": "sanjaykumar@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-9944",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-018",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-019",
+      "_id": "EMP-019",
+      "name": "Sanjay",
+      "email": "sanjay@nexora.com",
+      "passwordHash": "sanjayvijay1529",
+      "role": "member",
+      "department": "Design",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-8812",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-019",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-020",
+      "_id": "EMP-020",
+      "name": "Vishwa",
+      "email": "vishwa@nexora.com",
+      "passwordHash": "vishwa@7",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-4821",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-020",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-021",
+      "_id": "EMP-021",
+      "name": "Shakthi",
+      "email": "shakthi@nexora.com",
+      "passwordHash": "shakthij7",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-4810",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-021",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-022",
+      "_id": "EMP-022",
+      "name": "Farman",
+      "email": "farman@nexora.com",
+      "passwordHash": "Farman234",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-9182",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-022",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-023",
+      "_id": "EMP-023",
+      "name": "Gokul",
+      "email": "gokul@nexora.com",
+      "passwordHash": "Gokulpriyan@102",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+1 (555) 019-8139",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-023",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-024",
+      "_id": "EMP-024",
+      "name": "Naveen",
+      "email": "naveen@nexora.com",
+      "passwordHash": "Naveen20061980@@",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "8148602395",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-024",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-025",
+      "_id": "EMP-025",
+      "name": "ARUTSELVAN U",
+      "email": "arutselvan@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+917812891604",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-025",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-026",
+      "_id": "EMP-026",
+      "name": "Sanjay T",
+      "email": "sanjayt@nexora.com",
+      "passwordHash": "Abcd@1234",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 75399 88018",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-026",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-027",
+      "_id": "EMP-027",
+      "name": "Anish",
+      "email": "anish@nexora.com",
+      "passwordHash": "5846240",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 90805 07940",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-027",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-028",
+      "_id": "EMP-028",
+      "name": "Sivaranjini",
+      "email": "sivaranjini@nexora.com",
+      "passwordHash": "17031999",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 63840 49668",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-028",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-029",
+      "_id": "EMP-029",
+      "name": "Santhoshraj",
+      "email": "santhoshraj@nexora.com",
+      "passwordHash": "Santhoshraj@123",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 89257 08938",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-029",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-030",
+      "_id": "EMP-030",
+      "name": "Rohith",
+      "email": "rohit@nexora.com",
+      "passwordHash": "Rohith@2005.",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 96269 97021",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-030",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-031",
+      "_id": "EMP-031",
+      "name": "Prishaa Kamal P",
+      "email": "prisha@nexora.com",
+      "passwordHash": "Prishaa@06",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 63811 62502",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-031",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-032",
+      "_id": "EMP-032",
+      "name": "Srinithi",
+      "email": "srinithi@nexora.com",
+      "passwordHash": "srinithi19@",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 84382 72389",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-032",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-033",
+      "_id": "EMP-033",
+      "name": "Dinesh",
+      "email": "dinesh@nexora.com",
+      "passwordHash": "06102007",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "6381153191",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-033",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-034",
+      "_id": "EMP-034",
+      "name": "vishnu hasan R",
+      "email": "vishnu@nexora.com",
+      "passwordHash": "Vishnu30426",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "9790811943",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-034",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-035",
+      "_id": "EMP-035",
+      "name": "SANJAY S",
+      "email": "sanjays@nexora.com",
+      "passwordHash": "Dv2Sg5Hq9c9ZEMT",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 70101 66482",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-035",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-036",
+      "_id": "EMP-036",
+      "name": "BHARATH G",
+      "email": "bharath@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 85240 93856",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-036",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-037",
+      "_id": "EMP-037",
+      "name": "Sharon",
+      "email": "sharon@nexora.com",
+      "passwordHash": "292206",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 90429 88684",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-037",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-038",
+      "_id": "EMP-038",
+      "name": "Nidiya",
+      "email": "nidiya@nexora.com",
+      "passwordHash": "Nidi$1926",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 70941 69032",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-038",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-039",
+      "_id": "EMP-039",
+      "name": "Madona",
+      "email": "madona@nexora.com",
+      "passwordHash": "M1@2d3o4n5@6",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 94452 42902",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-039",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-041",
+      "_id": "EMP-041",
+      "name": "Kiruthika",
+      "email": "kiruthika@nexora.com",
+      "passwordHash": "123456",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+919360815338",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-041",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-042",
+      "_id": "EMP-042",
+      "name": "Yani Muizz",
+      "email": "yani@nexora.com",
+      "passwordHash": "inay@0326",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+918682986258",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-042",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-043",
+      "_id": "EMP-043",
+      "name": "Waseem Ahmed",
+      "email": "waseem@nexora.com",
+      "passwordHash": "741852",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+916374456261",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-043",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "EMP-40",
+      "_id": "EMP-40",
+      "name": "Kanimozhi",
+      "email": "kanimozhi@nexora.com",
+      "passwordHash": "kani@10",
+      "role": "member",
+      "department": "Engineering",
+      "college": "Nexora Technologies",
+      "phone": "+91 80982 05811",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "AI Systems"
+      ],
+      "status": "active",
+      "memberId": "EMP-40",
+      "avatarUrl": "",
+      "createdAt": "2026-01-15T09:00:00.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-parent-teacher",
+      "_id": "proj-parent-teacher",
+      "title": "Parent Teacher app",
+      "description": "Enterprise Parent teacher app software platform developed by Nexora Technologies.",
+      "category": "Software Engineering",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-12-31",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-07-28T06:33:32.881Z"
+      },
+      "createdAt": "2026-07-28T06:33:32.881Z"
+    }
+  ],
+  "roles": [
+    {
+      "id": "role-1",
+      "_id": "role-1",
+      "title": "Frontend Developer",
+      "category": "Frontend Engineering",
+      "department": "Engineering",
+      "responsibilities": [
+        "Build responsive, pixel-perfect user interface components using React & TypeScript",
+        "Integrate RESTful APIs and handle real-time WebSocket state streaming",
+        "Implement accessibility (WCAG 2.1) and cross-browser visual verification"
+      ],
+      "requiredSkills": [
+        "React",
+        "TypeScript",
+        "Tailwind CSS"
+      ],
+      "description": "Responsible for client-facing user interfaces and responsive UX interactions."
+    },
+    {
+      "id": "role-2",
+      "_id": "role-2",
+      "title": "Backend Developer",
+      "category": "Backend Engineering",
+      "department": "Engineering",
+      "responsibilities": [
+        "Design scalable REST endpoints in Express / Node.js",
+        "Manage PostgreSQL/MongoDB database indexing and query optimization"
+      ],
+      "requiredSkills": [
+        "Node.js",
+        "Express",
+        "PostgreSQL",
+        "TypeScript"
+      ],
+      "description": "Focuses on server architecture and data processing."
+    },
+    {
+      "id": "role-3",
+      "_id": "role-3",
+      "title": "AI Engineer",
+      "category": "Artificial Intelligence",
+      "department": "AI & Data Science",
+      "responsibilities": [
+        "Develop and fine-tune machine learning and natural language processing pipelines",
+        "Architect vector search indexing with semantic embedding models"
+      ],
+      "requiredSkills": [
+        "Python",
+        "PyTorch",
+        "LangChain",
+        "Transformers"
+      ],
+      "description": "Drives artificial intelligence models and semantic retrieval integration."
+    },
+    {
+      "id": "role-4",
+      "_id": "role-4",
+      "title": "UI/UX Designer",
+      "category": "Product Design",
+      "department": "Design",
+      "responsibilities": [
+        "Conduct user research and create interactive wireframes",
+        "Build and maintain design systems in Figma"
+      ],
+      "requiredSkills": [
+        "Figma",
+        "User Research",
+        "Design Systems"
+      ],
+      "description": "Crafts intuitive, aesthetically stunning digital interfaces."
+    },
+    {
+      "id": "role-5",
+      "_id": "role-5",
+      "title": "QA Engineer",
+      "category": "Quality Assurance",
+      "department": "Quality Assurance",
+      "responsibilities": [
+        "Formulate comprehensive test plans and quality matrices",
+        "Perform automated UI testing and REST API verification"
+      ],
+      "requiredSkills": [
+        "Jest",
+        "Playwright",
+        "API Testing"
+      ],
+      "description": "Guarantees software quality and product reliability."
+    }
+  ],
+  "assignments": [
+    {
+      "id": "asgn-pt-backend",
+      "_id": "asgn-pt-backend",
+      "projectId": "proj-parent-teacher",
+      "roleId": "role-2",
+      "memberId": "EMP-0001",
+      "assignedBy": "EMP-001",
+      "status": "accepted",
+      "assignedAt": "2026-07-28T06:33:32.881Z",
+      "respondedAt": "2026-07-28T06:33:49.913Z"
+    }
+  ],
+  "acknowledgements": [
+    {
+      "id": "ack-1785220429913",
+      "_id": "ack-1785220429913",
+      "assignmentId": "asgn-pt-backend",
+      "projectId": "proj-parent-teacher",
+      "roleId": "role-2",
+      "memberId": "EMP-0001",
+      "signatureType": "draw",
+      "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "typedName": "TRIVIN S",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Chrome Agent Tester",
+      "consentAccepted": true,
+      "qrCodeHash": "PRDAMS-ACK-PT-998877",
+      "timestamp": "2026-07-28T06:33:49.913Z"
+    }
+  ],
+  "notifications": [],
+  "auditLogs": [
+    {
+      "id": "log-1",
+      "_id": "log-1",
+      "action": "NEXORA_DATABASE_LOADED",
+      "performedBy": "EMP-001",
+      "performedByName": "Trivin (Admin)",
+      "performedByRole": "admin",
+      "targetType": "SYSTEM",
+      "targetId": "users_rows.csv",
+      "details": "Loaded 42 employee accounts without profile pictures.",
+      "timestamp": "2026-07-28T06:33:32.877Z"
+    }
+  ]
+}
