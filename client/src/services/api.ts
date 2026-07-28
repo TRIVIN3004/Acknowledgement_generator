@@ -75,6 +75,7 @@ export const api = {
   getAssignments: (params?: string) => apiRequest(`/assignments${params ? `?${params}` : ''}`),
   createAssignment: (data: any) => apiRequest('/assignments', { method: 'POST', body: JSON.stringify(data) }),
   updateAssignment: (id: string, data: any) => apiRequest(`/assignments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteAssignment: (id: string) => apiRequest(`/assignments/${id}`, { method: 'DELETE' }),
   respondAssignment: (id: string, data: any) => apiRequest(`/assignments/${id}/respond`, { method: 'PUT', body: JSON.stringify(data) }),
 
   // Acknowledgements

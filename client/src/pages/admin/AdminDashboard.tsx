@@ -19,6 +19,7 @@ import {
   Eye,
   UserCheck,
   Pencil,
+  Trash2,
   Check,
   X
 } from 'lucide-react';
@@ -134,6 +135,21 @@ export const AdminDashboard: React.FC = () => {
       alert(err.message || 'Failed to update role');
     } finally {
       setUpdatingRole(false);
+    }
+  };
+
+  const handleDeleteAssignment = async (asgnId: string, memberName: string) => {
+    if (window.confirm(`Are you sure you want to delete the assigned role for ${memberName}?`)) {
+      try {
+        const res = await api.deleteAssignment(asgnId);
+        if (res.success) {
+          await Promise.all([fetchAssignments(), fetchStats()]);
+        } else {
+          alert(res.message || 'Failed to delete assignment');
+        }
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete assignment');
+      }
     }
   };
 
@@ -564,15 +580,33 @@ export const AdminDashboard: React.FC = () => {
 
                         <td className="px-4 py-3 text-right">
                           {editingAssignmentId !== asgn.id && (asgn.status === 'pending' || asgn.status === 'change_requested') ? (
-                            <button
-                              onClick={() => handleStartEditRole(asgn)}
-                              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900 text-brand-600 dark:text-brand-400 font-bold text-xs border border-brand-200 dark:border-brand-800 transition-all cursor-pointer shadow-sm"
-                              title="Edit pending assigned role"
-                            >
-                              <Pencil className="w-3.5 h-3.5 text-brand-500" /> Edit Role
-                            </button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => handleStartEditRole(asgn)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900 text-brand-600 dark:text-brand-400 font-bold text-xs border border-brand-200 dark:border-brand-800 transition-all cursor-pointer shadow-sm"
+                                title="Edit pending assigned role"
+                              >
+                                <Pencil className="w-3.5 h-3.5 text-brand-500" /> Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAssignment(asgn.id, asgn.memberName || 'Member')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-sm"
+                                title="Delete role assignment"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-rose-500" /> Delete
+                              </button>
+                            </div>
                           ) : editingAssignmentId !== asgn.id ? (
-                            <span className="text-[10px] text-slate-400 font-semibold italic">Signed & Locked</span>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <span className="text-[10px] text-slate-400 font-semibold italic">Signed & Locked</span>
+                              <button
+                                onClick={() => handleDeleteAssignment(asgn.id, asgn.memberName || 'Member')}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 font-semibold text-[10px] border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
+                                title="Delete role assignment record"
+                              >
+                                <Trash2 className="w-3 h-3 text-slate-400 hover:text-rose-500" /> Delete
+                              </button>
+                            </div>
                           ) : null}
                         </td>
                       </tr>

@@ -586,3 +586,57 @@ export const updateAssignment = async (req: AuthenticatedRequest, res: Response)
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const deleteAssignment = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Only admins can delete role assignments' });
+    }
+
+    const idx = memoryStore.assignments.findIndex(a => a.id === id);
+    if (idx === -1) {
+      return res.status(404).json({ success: false, message: 'Assignment record not found' });
+    }
+
+    const deleted = memoryStore.assignments.splice(idx, 1)[0];
+
+    const ackIdx = memoryStore.acknowledgements.findIndex(k => k.assignmentId === id);
+    if (ackIdx !== -1) {
+      memoryStore.acknowledgements.splice(ackIdx, 1);
+    }
+
+    if (supabase) {
+      try {
+        await supabase.from('assignments').delete().match({ id });
+        await supabase.from('acknowledgements').delete().match({ assignment_id: id });
+      } catch (err) {
+        console.warn('Supabase deleteAssignment warning:', err);
+      }
+    }
+
+    const project = memoryStore.projects.find(p => p.id === deleted.projectId);
+    const member = memoryStore.users.find(u => u.id === deleted.memberId || u.email.toLowerCase() === String(deleted.memberId).toLowerCase());
+
+    // Audit log
+    memoryStore.auditLogs.unshift({
+      id: `log-${Date.now()}`,
+      action: 'ROLE_ASSIGNMENT_DELETED',
+      performedBy: req.user?.id || 'admin',
+      performedByName: req.user?.name || 'Admin',
+      performedByRole: 'admin',
+      targetType: 'ASSIGNMENT',
+      targetId: id,
+      details: `Deleted role assignment for ${member?.name || 'Member'} in project "${project?.title || 'Project'}"`,
+      timestamp: new Date().toISOString()
+    });
+
+    return res.json({
+      success: true,
+      message: `Role assignment for ${member?.name || 'Member'} deleted successfully`
+    });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
