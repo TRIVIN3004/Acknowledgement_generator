@@ -130,7 +130,6 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
     const totalMembers = memoryStore.users.filter(u => u.role === 'member').length;
     const totalRoles = memoryStore.roles.length;
 
-    // Filter assignments that have a corresponding signed acknowledgement
     const isAccepted = (a: any) => {
       if (a.status === 'accepted') return true;
       return memoryStore.acknowledgements.some(k => 
@@ -142,7 +141,6 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
     const pendingAcknowledgements = memoryStore.assignments.filter(a => !isAccepted(a) && a.status !== 'rejected').length;
     const completedAcknowledgements = memoryStore.acknowledgements.length;
 
-    // Members per project calculation
     const membersPerProjectMap: Record<string, number> = {};
     memoryStore.assignments.forEach(a => {
       const proj = memoryStore.projects.find(p => p.id === a.projectId);
@@ -156,7 +154,6 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
       value: membersPerProjectMap[title]
     }));
 
-    // Role Distribution calculation
     const roleDistMap: Record<string, number> = {};
     memoryStore.assignments.forEach(a => {
       const role = memoryStore.roles.find(r => r.id === a.roleId);
@@ -170,7 +167,6 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
       value: roleDistMap[title]
     }));
 
-    // Acceptance rate
     const totalAssignments = memoryStore.assignments.length;
     const acceptedCount = memoryStore.assignments.filter(a => isAccepted(a)).length;
     const acceptanceRate = totalAssignments > 0 ? Math.round((acceptedCount / totalAssignments) * 100) : 100;
@@ -322,24 +318,44 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
       }
     }
 
-    const targetUser = memoryStore.users.find(u => u.id === user.id || u.email.toLowerCase() === user.email.toLowerCase());
+    const targetUser = memoryStore.users.find(u => 
+      u.id === user.id || 
+      u.email.toLowerCase() === (user.email || '').toLowerCase() ||
+      (u.name && user.name && u.name.toLowerCase() === user.name.toLowerCase())
+    );
+
     const validUserIds = new Set([
       user.id,
       user.email,
+      (user.email || '').toLowerCase(),
       targetUser?.id,
       targetUser?._id,
-      targetUser?.email
+      targetUser?.email,
+      targetUser?.email?.toLowerCase()
     ].filter(Boolean));
 
     const myAssignments = memoryStore.assignments.filter(a => {
       if (validUserIds.has(a.memberId)) return true;
-      const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
-      return assignedUser && validUserIds.has(assignedUser.email);
+      if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
+      const assignedUser = memoryStore.users.find(u => 
+        u.id === a.memberId || 
+        u.email.toLowerCase() === String(a.memberId).toLowerCase() ||
+        (u.name && user.name && u.name.toLowerCase() === user.name.toLowerCase())
+      );
+      if (assignedUser) {
+        if (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email.toLowerCase())) return true;
+        if (validUserIds.has(assignedUser.id)) return true;
+        if (assignedUser.name && user.name && assignedUser.name.toLowerCase() === user.name.toLowerCase()) return true;
+      }
+      return false;
     });
 
     const myAcks = memoryStore.acknowledgements.filter(a => {
       if (validUserIds.has(a.memberId)) return true;
-      if (validUserIds.has(a.typedName)) return true;
+      if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
+      if (a.typedName && user.name && a.typedName.toLowerCase() === user.name.toLowerCase()) return true;
+      const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
+      if (assignedUser && (validUserIds.has(assignedUser.email) || (assignedUser.name && user.name && assignedUser.name.toLowerCase() === user.name.toLowerCase()))) return true;
       return false;
     });
 
