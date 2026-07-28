@@ -17,7 +17,10 @@ import {
   FileSpreadsheet,
   Search,
   Eye,
-  UserCheck
+  UserCheck,
+  Pencil,
+  Check,
+  X
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -32,7 +35,7 @@ import {
   Cell 
 } from 'recharts';
 import { api, apiRequest } from '../../services/api';
-import { AdminDashboardStats, Assignment } from '../../types';
+import { AdminDashboardStats, Assignment, RoleItem } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Modal } from '../../components/common/Modal';
 
@@ -42,12 +45,16 @@ export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Role Allocations Modal State
+  // Role Allocations & Edit State
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [allRoles, setAllRoles] = useState<RoleItem[]>([]);
   const [isAssignmentsModalOpen, setIsAssignmentsModalOpen] = useState(false);
   const [assignmentFilter, setAssignmentFilter] = useState<string>('all');
   const [assignmentSearch, setAssignmentSearch] = useState('');
   const [loadingAssignments, setLoadingAssignments] = useState(false);
+  const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+  const [updatingRole, setUpdatingRole] = useState(false);
 
   // CSV Import State
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
@@ -58,6 +65,7 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchStats();
     fetchAssignments();
+    fetchRoles();
   }, []);
 
   const fetchStats = async () => {
@@ -70,6 +78,17 @@ export const AdminDashboard: React.FC = () => {
       console.error('Failed to fetch admin stats:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const res = await api.getRoles();
+      if (res.success) {
+        setAllRoles(res.roles);
+      }
+    } catch (e) {
+      console.error('Failed to fetch roles:', e);
     }
   };
 
@@ -91,7 +110,31 @@ export const AdminDashboard: React.FC = () => {
     setAssignmentFilter(filter);
     setAssignmentSearch('');
     fetchAssignments();
+    fetchRoles();
     setIsAssignmentsModalOpen(true);
+  };
+
+  const handleStartEditRole = (asgn: Assignment) => {
+    setEditingAssignmentId(asgn.id);
+    setSelectedRoleId(asgn.roleId || asgn.role?.id || '');
+  };
+
+  const handleSaveEditedRole = async (asgnId: string) => {
+    if (!selectedRoleId) return;
+    setUpdatingRole(true);
+    try {
+      const res = await api.updateAssignment(asgnId, { roleId: selectedRoleId });
+      if (res.success) {
+        setEditingAssignmentId(null);
+        await Promise.all([fetchAssignments(), fetchStats()]);
+      } else {
+        alert(res.message || 'Failed to update role');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to update role');
+    } finally {
+      setUpdatingRole(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -436,17 +479,18 @@ export const AdminDashboard: React.FC = () => {
                     <th className="px-4 py-3">Assigned Role</th>
                     <th className="px-4 py-3">Target Project</th>
                     <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-right">Assigned Date</th>
+                    <th className="px-4 py-3">Assigned Date</th>
+                    <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/60 dark:divide-slate-700/60">
                   {loadingAssignments ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-slate-400">Loading role allocations...</td>
+                      <td colSpan={6} className="px-4 py-8 text-center text-slate-400">Loading role allocations...</td>
                     </tr>
                   ) : filteredAssignments.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-slate-400">No role assignments match the current filter.</td>
+                      <td colSpan={6} className="px-4 py-8 text-center text-slate-400">No role assignments match the current filter.</td>
                     </tr>
                   ) : (
                     filteredAssignments.map((asgn) => (
@@ -466,10 +510,41 @@ export const AdminDashboard: React.FC = () => {
                         </td>
 
                         <td className="px-4 py-3">
-                          <div>
-                            <p className="font-bold text-brand-600 dark:text-brand-400">{asgn.roleTitle || asgn.role?.title || 'Assigned Role'}</p>
-                            <p className="text-[10px] text-slate-400">{asgn.role?.department || 'Engineering'}</p>
-                          </div>
+                          {editingAssignmentId === asgn.id ? (
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={selectedRoleId}
+                                onChange={(e) => setSelectedRoleId(e.target.value)}
+                                className="px-2.5 py-1 text-xs rounded-xl bg-white dark:bg-slate-900 border-2 border-brand-500 text-slate-900 dark:text-white font-bold focus:outline-none shadow-sm"
+                              >
+                                {allRoles.map(r => (
+                                  <option key={r.id} value={r.id}>
+                                    {r.title} ({r.department})
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleSaveEditedRole(asgn.id)}
+                                disabled={updatingRole}
+                                className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-sm"
+                                title="Save Role"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setEditingAssignmentId(null)}
+                                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-600 dark:text-slate-300 text-xs font-bold cursor-pointer transition-all"
+                                title="Cancel"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-bold text-brand-600 dark:text-brand-400">{asgn.roleTitle || asgn.role?.title || 'Assigned Role'}</p>
+                              <p className="text-[10px] text-slate-400">{asgn.role?.department || 'Engineering'}</p>
+                            </div>
+                          )}
                         </td>
 
                         <td className="px-4 py-3">
@@ -483,8 +558,22 @@ export const AdminDashboard: React.FC = () => {
                           <StatusBadge status={asgn.status} />
                         </td>
 
-                        <td className="px-4 py-3 text-right font-mono text-[11px] text-slate-500">
+                        <td className="px-4 py-3 font-mono text-[11px] text-slate-500">
                           {new Date(asgn.assignedAt).toLocaleDateString()}
+                        </td>
+
+                        <td className="px-4 py-3 text-right">
+                          {editingAssignmentId !== asgn.id && (asgn.status === 'pending' || asgn.status === 'change_requested') ? (
+                            <button
+                              onClick={() => handleStartEditRole(asgn)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900 text-brand-600 dark:text-brand-400 font-bold text-xs border border-brand-200 dark:border-brand-800 transition-all cursor-pointer shadow-sm"
+                              title="Edit pending assigned role"
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-brand-500" /> Edit Role
+                            </button>
+                          ) : editingAssignmentId !== asgn.id ? (
+                            <span className="text-[10px] text-slate-400 font-semibold italic">Signed & Locked</span>
+                          ) : null}
                         </td>
                       </tr>
                     ))

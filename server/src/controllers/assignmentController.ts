@@ -467,3 +467,122 @@ export const respondToAssignment = async (req: AuthenticatedRequest, res: Respon
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updateAssignment = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { roleId, status } = req.body;
+
+    let assignment = memoryStore.assignments.find(a => a.id === id);
+    if (!assignment) {
+      return res.status(404).json({ success: false, message: 'Assignment record not found' });
+    }
+
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Only admins can modify role allocations' });
+    }
+
+    let updatedRole: any = null;
+    if (roleId) {
+      updatedRole = memoryStore.roles.find(r => r.id === roleId || r._id === roleId || r.title === roleId);
+      if (!updatedRole && supabase) {
+        try {
+          const { data } = await supabase.from('roles').select('*').or(`id.eq.${roleId},title.eq.${roleId}`).maybeSingle();
+          if (data) {
+            updatedRole = {
+              id: data.id,
+              _id: data.id,
+              title: data.title,
+              category: data.category || 'Engineering',
+              department: data.department || 'Software Engineering'
+            };
+            memoryStore.roles.unshift(updatedRole);
+          }
+        } catch (e) {}
+      }
+
+      if (updatedRole) {
+        assignment.roleId = updatedRole.id;
+      }
+    }
+
+    if (status) {
+      assignment.status = status;
+    }
+
+    if (supabase) {
+      try {
+        const updatePayload: any = {};
+        if (roleId && updatedRole) updatePayload.role_id = updatedRole.id;
+        if (status) updatePayload.status = status;
+
+        await supabase.from('assignments').update(updatePayload).eq('id', assignment.id);
+      } catch (err) {
+        console.warn('Supabase updateAssignment warning:', err);
+      }
+    }
+
+    const project = memoryStore.projects.find(p => p.id === assignment.projectId);
+    const member = memoryStore.users.find(u => u.id === assignment.memberId || u.email.toLowerCase() === String(assignment.memberId).toLowerCase());
+    const role = memoryStore.roles.find(r => r.id === assignment.roleId);
+
+    // Notify user of role update
+    if (member) {
+      const notif = {
+        id: `notif-${Date.now()}`,
+        _id: `notif-${Date.now()}`,
+        userId: member.id,
+        title: 'Assigned Role Updated!',
+        message: `Your assigned role for project "${project?.title || 'Project'}" has been updated to "${role?.title || 'New Role'}".`,
+        type: 'assignment',
+        read: false,
+        link: '/member/roles',
+        createdAt: new Date().toISOString()
+      };
+      memoryStore.notifications.unshift(notif);
+
+      if (supabase) {
+        try {
+          await supabase.from('notifications').insert([{
+            user_id: notif.userId,
+            title: notif.title,
+            message: notif.message,
+            type: notif.type,
+            read: false,
+            link: notif.link
+          }]);
+        } catch (e) {}
+      }
+    }
+
+    // Audit log
+    memoryStore.auditLogs.unshift({
+      id: `log-${Date.now()}`,
+      action: 'ROLE_ASSIGNMENT_UPDATED',
+      performedBy: req.user?.id || 'admin',
+      performedByName: req.user?.name || 'Admin',
+      performedByRole: 'admin',
+      targetType: 'ASSIGNMENT',
+      targetId: assignment.id,
+      details: `Updated role assignment for ${member?.name || 'Member'} to "${role?.title || 'Role'}" in "${project?.title || 'Project'}"`,
+      timestamp: new Date().toISOString()
+    });
+
+    return res.json({
+      success: true,
+      message: `Role updated to "${role?.title || 'New Role'}" successfully`,
+      assignment: {
+        ...assignment,
+        projectTitle: project?.title,
+        roleTitle: role?.title,
+        memberName: member?.name,
+        memberEmail: member?.email,
+        project,
+        role,
+        member
+      }
+    });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
