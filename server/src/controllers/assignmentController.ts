@@ -1,22 +1,71 @@
 import { Response } from 'express';
 import { memoryStore } from '../config/db.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
+import { supabase } from '../config/supabase.js';
 
 export const getAssignments = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // Sync from Supabase DB if available
+    if (supabase) {
+      try {
+        const { data: supaAssignments } = await supabase.from('assignments').select('*');
+        if (supaAssignments && Array.isArray(supaAssignments)) {
+          supaAssignments.forEach((a: any) => {
+            const formatted = {
+              id: a.id,
+              _id: a.id,
+              projectId: a.project_id,
+              roleId: a.role_id,
+              memberId: a.member_id,
+              assignedBy: a.assigned_by,
+              status: a.status || 'pending',
+              changeNote: a.change_note,
+              assignedAt: a.assigned_at || a.created_at || new Date().toISOString(),
+              respondedAt: a.responded_at
+            };
+
+            const idx = memoryStore.assignments.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) {
+              memoryStore.assignments[idx] = { ...memoryStore.assignments[idx], ...formatted };
+            } else {
+              memoryStore.assignments.unshift(formatted);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase getAssignments sync notice:', err);
+      }
+    }
+
     const { projectId, memberId, status } = req.query;
 
     let list = [...memoryStore.assignments];
 
     if (projectId) list = list.filter(a => a.projectId === projectId);
-    if (memberId) list = list.filter(a => a.memberId === memberId);
+
+    if (memberId) {
+      const targetUser = memoryStore.users.find(u => u.id === memberId || u.email.toLowerCase() === (memberId as string).toLowerCase());
+      const userIdsToMatch = new Set([
+        memberId as string,
+        targetUser?.id,
+        targetUser?._id,
+        targetUser?.email
+      ].filter(Boolean));
+
+      list = list.filter(a => {
+        if (userIdsToMatch.has(a.memberId)) return true;
+        const assignedUser = memoryStore.users.find(u => u.id === a.memberId);
+        return assignedUser && userIdsToMatch.has(assignedUser.email);
+      });
+    }
+
     if (status && status !== 'all') list = list.filter(a => a.status === status);
 
     // Populate relations
     const enriched = list.map(a => {
       const project = memoryStore.projects.find(p => p.id === a.projectId);
       const role = memoryStore.roles.find(r => r.id === a.roleId);
-      const member = memoryStore.users.find(u => u.id === a.memberId);
+      const member = memoryStore.users.find(u => u.id === a.memberId || u.email === a.memberId);
       const ack = memoryStore.acknowledgements.find(k => k.assignmentId === a.id);
 
       return {
@@ -48,7 +97,7 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
 
     const project = memoryStore.projects.find(p => p.id === projectId);
     const role = memoryStore.roles.find(r => r.id === roleId);
-    const member = memoryStore.users.find(u => u.id === memberId);
+    const member = memoryStore.users.find(u => u.id === memberId || u.email === memberId);
 
     if (!project || !role || !member) {
       return res.status(404).json({ success: false, message: 'Specified Project, Role, or Member was not found' });
@@ -56,37 +105,73 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
 
     // Check existing pending assignment
     const existing = memoryStore.assignments.find(
-      a => a.projectId === projectId && a.memberId === memberId && a.roleId === roleId && a.status === 'pending'
+      a => a.projectId === projectId && (a.memberId === memberId || a.memberId === member.id) && a.roleId === roleId && a.status === 'pending'
     );
     if (existing) {
       return res.status(400).json({ success: false, message: 'This member has already been assigned this pending role' });
     }
 
-    const newAssignment = {
+    const newAssignment: any = {
       id: `asgn-${Date.now()}`,
       _id: `asgn-${Date.now()}`,
       projectId,
       roleId,
-      memberId,
+      memberId: member.id,
       assignedBy: req.user?.id || 'admin',
       status: 'pending',
       assignedAt: new Date().toISOString()
     };
 
+    if (supabase) {
+      try {
+        const { data: supaData, error } = await supabase.from('assignments').insert([{
+          project_id: newAssignment.projectId,
+          role_id: newAssignment.roleId,
+          member_id: newAssignment.memberId,
+          assigned_by: newAssignment.assignedBy,
+          status: newAssignment.status,
+          assigned_at: newAssignment.assignedAt
+        }]).select();
+
+        if (!error && supaData && supaData[0]) {
+          newAssignment.id = supaData[0].id;
+          newAssignment._id = supaData[0].id;
+        }
+      } catch (err) {
+        console.warn('Supabase createAssignment notice:', err);
+      }
+    }
+
     memoryStore.assignments.unshift(newAssignment);
 
-    // Send notification to assigned member
-    memoryStore.notifications.unshift({
+    // Create notification
+    const newNotif = {
       id: `notif-${Date.now()}`,
       _id: `notif-${Date.now()}`,
-      userId: memberId,
+      userId: member.id,
       title: 'New Role Assigned!',
       message: `You have been assigned as "${role.title}" for project "${project.title}". Please review and sign digital acknowledgement.`,
       type: 'assignment',
       read: false,
       link: '/member/roles',
       createdAt: new Date().toISOString()
-    });
+    };
+    memoryStore.notifications.unshift(newNotif);
+
+    if (supabase) {
+      try {
+        await supabase.from('notifications').insert([{
+          user_id: newNotif.userId,
+          title: newNotif.title,
+          message: newNotif.message,
+          type: newNotif.type,
+          read: false,
+          link: newNotif.link
+        }]);
+      } catch (err) {
+        console.warn('Supabase notification insert notice:', err);
+      }
+    }
 
     // Audit log
     memoryStore.auditLogs.unshift({
@@ -147,10 +232,22 @@ export const respondToAssignment = async (req: AuthenticatedRequest, res: Respon
       return res.status(400).json({ success: false, message: 'Invalid action provided' });
     }
 
+    if (supabase) {
+      try {
+        await supabase.from('assignments').update({
+          status: assignment.status,
+          change_note: assignment.changeNote,
+          responded_at: assignment.respondedAt
+        }).match({ id: assignment.id });
+      } catch (err) {
+        console.warn('Supabase respondToAssignment notice:', err);
+      }
+    }
+
     // Notify admins
     const adminUser = memoryStore.users.find(u => u.role === 'admin');
     if (adminUser) {
-      memoryStore.notifications.unshift({
+      const notif = {
         id: `notif-${Date.now()}`,
         _id: `notif-${Date.now()}`,
         userId: adminUser.id,
@@ -160,7 +257,23 @@ export const respondToAssignment = async (req: AuthenticatedRequest, res: Respon
         read: false,
         link: '/admin/acknowledgements',
         createdAt: new Date().toISOString()
-      });
+      };
+      memoryStore.notifications.unshift(notif);
+
+      if (supabase) {
+        try {
+          await supabase.from('notifications').insert([{
+            user_id: notif.userId,
+            title: notif.title,
+            message: notif.message,
+            type: notif.type,
+            read: false,
+            link: notif.link
+          }]);
+        } catch (err) {
+          console.warn('Supabase admin notification notice:', err);
+        }
+      }
     }
 
     return res.json({ success: true, message: `Assignment ${action}ed successfully`, assignment });

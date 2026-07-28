@@ -1,9 +1,40 @@
 import { Response } from 'express';
 import { memoryStore } from '../config/db.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
+import { supabase } from '../config/supabase.js';
 
 export const getRoles = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    if (supabase) {
+      try {
+        const { data: supaRoles } = await supabase.from('roles').select('*');
+        if (supaRoles && Array.isArray(supaRoles)) {
+          supaRoles.forEach((r: any) => {
+            const formatted = {
+              id: r.id,
+              _id: r.id,
+              title: r.title,
+              category: r.category || 'Engineering',
+              department: r.department || 'Software Development',
+              responsibilities: r.responsibilities || [],
+              requiredSkills: r.required_skills || [],
+              description: r.description || `Professional ${r.title} role responsible for project excellence.`,
+              createdAt: r.created_at || new Date().toISOString()
+            };
+
+            const idx = memoryStore.roles.findIndex(x => x.id === formatted.id || x.title.toLowerCase() === formatted.title.toLowerCase());
+            if (idx !== -1) {
+              memoryStore.roles[idx] = { ...memoryStore.roles[idx], ...formatted };
+            } else {
+              memoryStore.roles.unshift(formatted);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase getRoles sync notice:', err);
+      }
+    }
+
     return res.json({ success: true, count: memoryStore.roles.length, roles: memoryStore.roles });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -31,7 +62,7 @@ export const createRole = async (req: AuthenticatedRequest, res: Response) => {
       ? requiredSkills
       : (requiredSkills ? requiredSkills.split(',').map((s: string) => s.trim()).filter(Boolean) : []);
 
-    const newRole = {
+    const newRole: any = {
       id: `role-${Date.now()}`,
       _id: `role-${Date.now()}`,
       title,
@@ -42,6 +73,26 @@ export const createRole = async (req: AuthenticatedRequest, res: Response) => {
       description: description || `Professional ${title} role responsible for project excellence.`,
       createdAt: new Date().toISOString()
     };
+
+    if (supabase) {
+      try {
+        const { data: supaData, error } = await supabase.from('roles').insert([{
+          title: newRole.title,
+          category: newRole.category,
+          department: newRole.department,
+          responsibilities: newRole.responsibilities,
+          required_skills: newRole.requiredSkills,
+          description: newRole.description
+        }]).select();
+
+        if (!error && supaData && supaData[0]) {
+          newRole.id = supaData[0].id;
+          newRole._id = supaData[0].id;
+        }
+      } catch (err) {
+        console.warn('Supabase createRole notice:', err);
+      }
+    }
 
     memoryStore.roles.unshift(newRole);
 
@@ -91,6 +142,21 @@ export const updateRole = async (req: AuthenticatedRequest, res: Response) => {
         : requiredSkills.split(',').map((s: string) => s.trim()).filter(Boolean);
     }
 
+    if (supabase) {
+      try {
+        await supabase.from('roles').update({
+          title: role.title,
+          category: role.category,
+          department: role.department,
+          responsibilities: role.responsibilities,
+          required_skills: role.requiredSkills,
+          description: role.description
+        }).match({ id: role.id });
+      } catch (err) {
+        console.warn('Supabase updateRole notice:', err);
+      }
+    }
+
     return res.json({ success: true, message: 'Role updated successfully', role });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -107,6 +173,14 @@ export const deleteRole = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const deleted = memoryStore.roles.splice(idx, 1)[0];
+
+    if (supabase) {
+      try {
+        await supabase.from('roles').delete().match({ id: id });
+      } catch (err) {
+        console.warn('Supabase deleteRole notice:', err);
+      }
+    }
 
     return res.json({ success: true, message: `Role "${deleted.title}" deleted successfully` });
   } catch (error: any) {
