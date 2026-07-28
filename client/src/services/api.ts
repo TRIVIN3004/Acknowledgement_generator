@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api';
 
 export const getAuthToken = () => localStorage.getItem('prdams_token');
 
@@ -19,14 +19,32 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
     headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    
+    let data: any = {};
+    const contentType = response.headers.get('content-type');
+    
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { message: text || `HTTP ${response.status} ${response.statusText}` };
+      }
+    }
 
-  if (!response.ok) {
-    throw new Error(data.message || 'API Request Failed');
+    if (!response.ok) {
+      throw new Error(data.message || `API Request Failed with status ${response.status}`);
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error(`[API Error] ${endpoint}:`, error);
+    throw error;
   }
-
-  return data;
 }
 
 export const api = {
