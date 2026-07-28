@@ -1,0 +1,25 @@
+{
+  "name": "prdams-monorepo",
+  "version": "1.0.0",
+  "description": "Project Role & Digital Acknowledgement Management System (PRDAMS)",
+  "main": "server/src/server.ts",
+  "scripts": {
+    "setup": "cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:server && npm run build:client"
+  },
+  "keywords": [
+    "prdams",
+    "digital-signature",
+    "acknowledgement",
+    "react",
+    "express",
+    "mongodb",
+    "typescript"
+  ],
+  "author": "PRDAMS Team",
+  "license": "MIT"
+}
