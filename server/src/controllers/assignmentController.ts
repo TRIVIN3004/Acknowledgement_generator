@@ -5,12 +5,77 @@ import { supabase } from '../config/supabase.js';
 
 export const getAssignments = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Sync from Supabase DB if available
+    // 1. Full sync of all tables from Supabase if connected
     if (supabase) {
       try {
-        const { data: supaAssignments } = await supabase.from('assignments').select('*');
-        if (supaAssignments && Array.isArray(supaAssignments)) {
-          supaAssignments.forEach((a: any) => {
+        const [usersRes, projRes, rolesRes, asgnRes, ackRes] = await Promise.all([
+          supabase.from('users').select('*'),
+          supabase.from('projects').select('*'),
+          supabase.from('roles').select('*'),
+          supabase.from('assignments').select('*'),
+          supabase.from('acknowledgements').select('*')
+        ]);
+
+        if (usersRes.data) {
+          usersRes.data.forEach((u: any) => {
+            const formatted = {
+              id: u.id,
+              _id: u.id,
+              name: u.name,
+              email: u.email,
+              role: u.role || 'member',
+              department: u.department,
+              college: u.college,
+              memberId: u.member_id,
+              avatarUrl: u.avatar_url
+            };
+            const idx = memoryStore.users.findIndex(x => x.email.toLowerCase() === (u.email || '').toLowerCase() || x.id === u.id);
+            if (idx !== -1) memoryStore.users[idx] = { ...memoryStore.users[idx], ...formatted };
+            else memoryStore.users.push(formatted);
+          });
+        }
+
+        if (projRes.data) {
+          projRes.data.forEach((p: any) => {
+            const formatted = {
+              id: p.id,
+              _id: p.id,
+              title: p.title,
+              description: p.description,
+              category: p.category || 'Enterprise Web Application',
+              technologyStack: Array.isArray(p.technology_stack) ? p.technology_stack : ['React', 'TypeScript'],
+              leadName: p.lead_name || 'Admin',
+              deadline: p.deadline || '2026-12-31',
+              status: p.status || 'planning',
+              timeline: { assignedAt: p.created_at || new Date().toISOString() },
+              createdAt: p.created_at || new Date().toISOString()
+            };
+            const idx = memoryStore.projects.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.projects[idx] = formatted;
+            else memoryStore.projects.unshift(formatted);
+          });
+        }
+
+        if (rolesRes.data) {
+          rolesRes.data.forEach((r: any) => {
+            const formatted = {
+              id: r.id,
+              _id: r.id,
+              title: r.title,
+              category: r.category || 'Engineering',
+              department: r.department || 'Software Development',
+              responsibilities: r.responsibilities || [],
+              requiredSkills: r.required_skills || [],
+              description: r.description || `Role ${r.title}`
+            };
+            const idx = memoryStore.roles.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.roles[idx] = formatted;
+            else memoryStore.roles.unshift(formatted);
+          });
+        }
+
+        if (asgnRes.data) {
+          asgnRes.data.forEach((a: any) => {
             const formatted = {
               id: a.id,
               _id: a.id,
@@ -32,30 +97,71 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
             }
           });
         }
+
+        if (ackRes.data) {
+          ackRes.data.forEach((k: any) => {
+            const formatted = {
+              id: k.id,
+              _id: k.id,
+              assignmentId: k.assignment_id,
+              projectId: k.project_id,
+              roleId: k.role_id,
+              memberId: k.member_id,
+              signatureType: k.signature_type,
+              signatureData: k.signature_data,
+              typedName: k.typed_name,
+              ipAddress: k.ip_address,
+              timestamp: k.timestamp,
+              qrCodeHash: k.qr_code_hash
+            };
+            const idx = memoryStore.acknowledgements.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.acknowledgements[idx] = formatted;
+            else memoryStore.acknowledgements.unshift(formatted);
+          });
+        }
       } catch (err) {
         console.warn('Supabase getAssignments sync notice:', err);
       }
     }
 
     const { projectId, memberId, status } = req.query;
+    const currentUser = req.user;
 
     let list = [...memoryStore.assignments];
 
     if (projectId) list = list.filter(a => a.projectId === projectId);
 
-    if (memberId) {
-      const targetUser = memoryStore.users.find(u => u.id === memberId || u.email.toLowerCase() === (memberId as string).toLowerCase());
-      const userIdsToMatch = new Set([
-        memberId as string,
-        targetUser?.id,
-        targetUser?._id,
-        targetUser?.email
+    const targetMemberQuery = memberId || (currentUser?.role === 'member' ? currentUser?.id : null);
+    if (targetMemberQuery) {
+      const matchedUser = memoryStore.users.find(
+        u => u.id === targetMemberQuery || 
+             u.email.toLowerCase() === String(targetMemberQuery).toLowerCase() ||
+             u.id === currentUser?.id ||
+             u.email.toLowerCase() === currentUser?.email?.toLowerCase()
+      );
+
+      const targetEmails = new Set([
+        currentUser?.email?.toLowerCase(),
+        matchedUser?.email?.toLowerCase(),
+        String(targetMemberQuery).toLowerCase()
+      ].filter(Boolean));
+
+      const targetIds = new Set([
+        currentUser?.id,
+        matchedUser?.id,
+        matchedUser?._id,
+        String(targetMemberQuery)
       ].filter(Boolean));
 
       list = list.filter(a => {
-        if (userIdsToMatch.has(a.memberId)) return true;
-        const assignedUser = memoryStore.users.find(u => u.id === a.memberId);
-        return assignedUser && userIdsToMatch.has(assignedUser.email);
+        if (targetIds.has(a.memberId)) return true;
+        if (targetEmails.has(String(a.memberId).toLowerCase())) return true;
+        const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
+        if (assignedUser) {
+          if (targetEmails.has(assignedUser.email.toLowerCase())) return true;
+          if (targetIds.has(assignedUser.id)) return true;
+        }
+        return false;
       });
     }
 
@@ -65,7 +171,7 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
     const enriched = list.map(a => {
       const project = memoryStore.projects.find(p => p.id === a.projectId);
       const role = memoryStore.roles.find(r => r.id === a.roleId);
-      const member = memoryStore.users.find(u => u.id === a.memberId || u.email === a.memberId);
+      const member = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
       const ack = memoryStore.acknowledgements.find(k => k.assignmentId === a.id);
 
       return {
