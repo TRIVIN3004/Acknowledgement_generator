@@ -138,7 +138,20 @@ export function parseUsersCsv() {
 
   const assignments = userProjectPairs.map((pair, idx) => {
     const proj = projects.find(p => p.title === pair.projectTitle);
-    const roleId = defaultRoles[idx % defaultRoles.length].id;
+    const user = parsedUsers.find(u => u.id === pair.userId || u.email.toLowerCase() === (pair.userId || '').toLowerCase());
+    
+    let roleId = 'role-1';
+    if (user) {
+      const dept = (user.department || '').toLowerCase();
+      if (dept.includes('qa') || dept.includes('quality')) roleId = 'role-5'; // QA Engineer
+      else if (dept.includes('design')) roleId = 'role-4'; // UI/UX Designer
+      else if (dept.includes('ai') || dept.includes('data')) roleId = 'role-3'; // AI Engineer
+      else if (idx % 2 === 0) roleId = 'role-1'; // Frontend Developer
+      else roleId = 'role-2'; // Backend Developer
+    } else {
+      roleId = defaultRoles[idx % defaultRoles.length].id;
+    }
+
     return {
       id: `asgn-${idx + 1}`,
       _id: `asgn-${idx + 1}`,

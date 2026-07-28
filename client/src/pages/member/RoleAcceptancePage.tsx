@@ -18,6 +18,7 @@ import { Modal } from '../../components/common/Modal';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { DigitalSignatureModal } from '../../components/signature/DigitalSignatureModal';
 import { AcknowledgementLetterPreview } from '../../components/pdf/AcknowledgementLetterPreview';
+import { getFallbackRoleDetails } from '../../utils/roleUtils';
 
 export const RoleAcceptancePage: React.FC = () => {
   const { user } = useAuth();
@@ -192,38 +193,43 @@ export const RoleAcceptancePage: React.FC = () => {
                   </div>
 
                   {/* Right Col: Assigned Role Card */}
-                  <div className="p-5 rounded-2xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-100 dark:border-brand-900/50 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 dark:text-brand-400">
-                        Assigned Role
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        {role?.department || user?.department || 'Software Engineering'}
-                      </span>
-                    </div>
+                  {(() => {
+                    const fallback = getFallbackRoleDetails(user?.department, asgn.roleTitle);
+                    const displayTitle = role?.title || (asgn.roleTitle && asgn.roleTitle !== 'Unknown Role' ? asgn.roleTitle : fallback.title);
+                    const displayDept = role?.department || user?.department || fallback.department;
+                    const displayResps = (role?.responsibilities && role.responsibilities.length > 0) ? role.responsibilities : fallback.responsibilities;
 
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                      {role?.title || asgn.roleTitle || 'Software Engineer'}
-                    </h3>
+                    return (
+                      <div className="p-5 rounded-2xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-100 dark:border-brand-900/50 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 dark:text-brand-400">
+                            Assigned Role
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                            {displayDept}
+                          </span>
+                        </div>
 
-                    <div>
-                      <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Key Responsibilities:
-                      </h4>
-                      <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-                        {(role?.responsibilities && role.responsibilities.length > 0 ? role.responsibilities : [
-                          'Develop and implement technical features and project modules.',
-                          'Collaborate with project leads and cross-functional team members.',
-                          'Maintain clean code principles and digital signature verification compliance.'
-                        ]).map((resp, i) => (
-                          <li key={i} className="flex items-start gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
-                            <span>{resp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                          {displayTitle}
+                        </h3>
+
+                        <div>
+                          <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Key Responsibilities:
+                          </h4>
+                          <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                            {displayResps.map((resp, i) => (
+                              <li key={i} className="flex items-start gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
+                                <span>{resp}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Actions Bar */}
@@ -360,17 +366,19 @@ export const RoleAcceptancePage: React.FC = () => {
                 : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
               deadline: activeLetterAck.project?.deadline || '2026-12-31'
             }}
-            role={{
-              title: activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle || 'Software Engineer',
-              department: activeLetterAck.role?.department || activeLetterAck.member?.department || user?.department || 'Software Engineering',
-              responsibilities: (activeLetterAck.role?.responsibilities && activeLetterAck.role.responsibilities.length > 0)
-                ? activeLetterAck.role.responsibilities
-                : [
-                    'Develop, test, and deliver modular application features.',
-                    'Collaborate with project leads and cross-functional engineering team members.',
-                    'Maintain clean code principles and digital signature verification compliance.'
-                  ]
-            }}
+            role={(() => {
+              const fallback = getFallbackRoleDetails(
+                activeLetterAck.member?.department || user?.department,
+                activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle
+              );
+              return {
+                title: activeLetterAck.role?.title || (activeLetterAck as any).roleTitle || (activeLetterAck as any).assignment?.roleTitle || fallback.title,
+                department: activeLetterAck.role?.department || activeLetterAck.member?.department || user?.department || fallback.department,
+                responsibilities: (activeLetterAck.role?.responsibilities && activeLetterAck.role.responsibilities.length > 0)
+                  ? activeLetterAck.role.responsibilities
+                  : fallback.responsibilities
+              };
+            })()}
             acknowledgement={{
               signatureData: activeLetterAck.signatureData,
               signatureType: activeLetterAck.signatureType,

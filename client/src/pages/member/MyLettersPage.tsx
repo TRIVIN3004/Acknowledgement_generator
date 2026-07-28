@@ -5,6 +5,7 @@ import { Acknowledgement } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { AcknowledgementLetterPreview } from '../../components/pdf/AcknowledgementLetterPreview';
 import { useAuth } from '../../context/AuthContext';
+import { getFallbackRoleDetails } from '../../utils/roleUtils';
 
 export const MyLettersPage: React.FC = () => {
   const { user } = useAuth();
@@ -64,7 +65,13 @@ export const MyLettersPage: React.FC = () => {
                     {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Nexora Project'}
                   </h3>
                   <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-                    Role: {ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || 'Software Engineer'}
+                    Role: {(() => {
+                      const fallback = getFallbackRoleDetails(
+                        ack.member?.department || user?.department,
+                        ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle
+                      );
+                      return ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || fallback.title;
+                    })()}
                   </p>
                 </div>
 
@@ -128,17 +135,19 @@ export const MyLettersPage: React.FC = () => {
                 : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
               deadline: selectedAck.project?.deadline || '2026-12-31'
             }}
-            role={{
-              title: selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle || 'Software Engineer',
-              department: selectedAck.role?.department || selectedAck.member?.department || user?.department || 'Software Engineering',
-              responsibilities: (selectedAck.role?.responsibilities && selectedAck.role.responsibilities.length > 0)
-                ? selectedAck.role.responsibilities
-                : [
-                    'Develop, test, and deliver modular application features.',
-                    'Collaborate with project leads and cross-functional engineering team members.',
-                    'Maintain clean code principles and digital signature verification compliance.'
-                  ]
-            }}
+            role={(() => {
+              const fallback = getFallbackRoleDetails(
+                selectedAck.member?.department || user?.department,
+                selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle
+              );
+              return {
+                title: selectedAck.role?.title || (selectedAck as any).roleTitle || (selectedAck as any).assignment?.roleTitle || fallback.title,
+                department: selectedAck.role?.department || selectedAck.member?.department || user?.department || fallback.department,
+                responsibilities: (selectedAck.role?.responsibilities && selectedAck.role.responsibilities.length > 0)
+                  ? selectedAck.role.responsibilities
+                  : fallback.responsibilities
+              };
+            })()}
             acknowledgement={{
               signatureData: selectedAck.signatureData,
               signatureType: selectedAck.signatureType,
