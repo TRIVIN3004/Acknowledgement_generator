@@ -320,8 +320,7 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
 
     const targetUser = memoryStore.users.find(u => 
       u.id === user.id || 
-      u.email.toLowerCase() === (user.email || '').toLowerCase() ||
-      (u.name && user.name && u.name.toLowerCase() === user.name.toLowerCase())
+      u.email.toLowerCase() === (user.email || '').toLowerCase()
     );
 
     const validUserIds = new Set([
@@ -339,13 +338,11 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
       if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
       const assignedUser = memoryStore.users.find(u => 
         u.id === a.memberId || 
-        u.email.toLowerCase() === String(a.memberId).toLowerCase() ||
-        (u.name && user.name && u.name.toLowerCase() === user.name.toLowerCase())
+        u.email.toLowerCase() === String(a.memberId).toLowerCase()
       );
       if (assignedUser) {
         if (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email.toLowerCase())) return true;
         if (validUserIds.has(assignedUser.id)) return true;
-        if (assignedUser.name && user.name && assignedUser.name.toLowerCase() === user.name.toLowerCase()) return true;
       }
       return false;
     });
@@ -353,9 +350,11 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
     const myAcks = memoryStore.acknowledgements.filter(a => {
       if (validUserIds.has(a.memberId)) return true;
       if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
-      if (a.typedName && user.name && a.typedName.toLowerCase() === user.name.toLowerCase()) return true;
-      const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
-      if (assignedUser && (validUserIds.has(assignedUser.email) || (assignedUser.name && user.name && assignedUser.name.toLowerCase() === user.name.toLowerCase()))) return true;
+      const assignedUser = memoryStore.users.find(u => 
+        u.id === a.memberId || 
+        u.email.toLowerCase() === String(a.memberId).toLowerCase()
+      );
+      if (assignedUser && (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email.toLowerCase()))) return true;
       return false;
     });
 
