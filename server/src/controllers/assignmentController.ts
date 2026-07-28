@@ -95,17 +95,97 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
       return res.status(400).json({ success: false, message: 'Project, Role, and Member are required' });
     }
 
-    const project = memoryStore.projects.find(p => p.id === projectId);
-    const role = memoryStore.roles.find(r => r.id === roleId);
-    const member = memoryStore.users.find(u => u.id === memberId || u.email === memberId);
+    // 1. Locate Project (memoryStore -> Supabase fallback)
+    let project = memoryStore.projects.find(p => p.id === projectId || p._id === projectId || p.title === projectId);
+    if (!project && supabase) {
+      try {
+        const { data } = await supabase.from('projects').select('*').or(`id.eq.${projectId},title.eq.${projectId}`).maybeSingle();
+        if (data) {
+          project = {
+            id: data.id,
+            _id: data.id,
+            title: data.title,
+            description: data.description,
+            category: data.category || 'Enterprise Web Application',
+            technologyStack: Array.isArray(data.technology_stack) ? data.technology_stack : ['React', 'TypeScript'],
+            leadId: data.lead_id || 'usr-admin-1',
+            leadName: data.lead_name || 'Project Lead',
+            deadline: data.deadline || '2026-12-31',
+            status: data.status || 'planning',
+            timeline: { assignedAt: data.created_at || new Date().toISOString() },
+            createdAt: data.created_at || new Date().toISOString()
+          };
+          memoryStore.projects.unshift(project);
+        }
+      } catch (err) {
+        console.warn('Supabase project lookup error:', err);
+      }
+    }
+
+    // 2. Locate Role (memoryStore -> Supabase fallback)
+    let role = memoryStore.roles.find(r => r.id === roleId || r._id === roleId || r.title === roleId);
+    if (!role && supabase) {
+      try {
+        const { data } = await supabase.from('roles').select('*').or(`id.eq.${roleId},title.eq.${roleId}`).maybeSingle();
+        if (data) {
+          role = {
+            id: data.id,
+            _id: data.id,
+            title: data.title,
+            category: data.category || 'Engineering',
+            department: data.department || 'Software Development',
+            responsibilities: data.responsibilities || [],
+            requiredSkills: data.required_skills || [],
+            description: data.description || `Role ${data.title}`,
+            createdAt: data.created_at || new Date().toISOString()
+          };
+          memoryStore.roles.unshift(role);
+        }
+      } catch (err) {
+        console.warn('Supabase role lookup error:', err);
+      }
+    }
+
+    // 3. Locate Member (memoryStore -> Supabase fallback)
+    let member = memoryStore.users.find(u => u.id === memberId || u._id === memberId || u.email.toLowerCase() === (memberId as string).toLowerCase());
+    if (!member && supabase) {
+      try {
+        const { data } = await supabase.from('users').select('*').or(`id.eq.${memberId},email.eq.${memberId}`).maybeSingle();
+        if (data) {
+          member = {
+            id: data.id,
+            _id: data.id,
+            name: data.name,
+            email: data.email,
+            passwordHash: data.password_hash,
+            role: data.role || 'member',
+            department: data.department || 'Engineering',
+            college: data.college || 'University',
+            phone: data.phone || '+1 (555) 000-0000',
+            skills: data.skills || [],
+            status: data.status || 'active',
+            memberId: data.member_id || 'DEV-101',
+            avatarUrl: data.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
+            createdAt: data.created_at || new Date().toISOString()
+          };
+          memoryStore.users.push(member);
+        }
+      } catch (err) {
+        console.warn('Supabase member lookup error:', err);
+      }
+    }
 
     if (!project || !role || !member) {
-      return res.status(404).json({ success: false, message: 'Specified Project, Role, or Member was not found' });
+      const missing = !project ? 'Project' : !role ? 'Role' : 'Member';
+      return res.status(404).json({ success: false, message: `Specified ${missing} was not found` });
     }
 
     // Check existing pending assignment
     const existing = memoryStore.assignments.find(
-      a => a.projectId === projectId && (a.memberId === memberId || a.memberId === member.id) && a.roleId === roleId && a.status === 'pending'
+      a => (a.projectId === project.id || a.projectId === projectId) && 
+           (a.memberId === member.id || a.memberId === memberId) && 
+           (a.roleId === role.id || a.roleId === roleId) && 
+           a.status === 'pending'
     );
     if (existing) {
       return res.status(400).json({ success: false, message: 'This member has already been assigned this pending role' });
@@ -114,8 +194,8 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
     const newAssignment: any = {
       id: `asgn-${Date.now()}`,
       _id: `asgn-${Date.now()}`,
-      projectId,
-      roleId,
+      projectId: project.id,
+      roleId: role.id,
       memberId: member.id,
       assignedBy: req.user?.id || 'admin',
       status: 'pending',
