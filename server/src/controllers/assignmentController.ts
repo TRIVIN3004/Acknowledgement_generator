@@ -472,8 +472,32 @@ export const updateAssignment = async (req: AuthenticatedRequest, res: Response)
   try {
     const { id } = req.params;
     const { roleId, status } = req.body;
+    const cleanId = String(id).trim();
 
-    let assignment = memoryStore.assignments.find(a => a.id === id);
+    let assignment = memoryStore.assignments.find(a => 
+      a.id === cleanId || 
+      a._id === cleanId || 
+      String(a.id).trim() === cleanId || 
+      String(a._id).trim() === cleanId
+    );
+
+    if (!assignment && supabase) {
+      try {
+        const { data: supaAsgn } = await supabase.from('assignments').select('*').or(`id.eq.${cleanId},_id.eq.${cleanId}`).maybeSingle();
+        if (supaAsgn) {
+          assignment = {
+            id: supaAsgn.id,
+            _id: supaAsgn.id,
+            projectId: supaAsgn.project_id,
+            roleId: supaAsgn.role_id,
+            memberId: supaAsgn.member_id,
+            status: supaAsgn.status || 'pending'
+          };
+          memoryStore.assignments.push(assignment);
+        }
+      } catch (e) {}
+    }
+
     if (!assignment) {
       return res.status(404).json({ success: false, message: 'Assignment record not found' });
     }
@@ -597,22 +621,65 @@ export const deleteAssignment = async (req: AuthenticatedRequest, res: Response)
       return res.status(403).json({ success: false, message: 'Only admins can delete role assignments' });
     }
 
-    const idx = memoryStore.assignments.findIndex(a => a.id === id);
-    if (idx === -1) {
+    const cleanId = String(id).trim();
+
+    // 1. Flexible lookup in memoryStore
+    let idx = memoryStore.assignments.findIndex(a => 
+      a.id === cleanId || 
+      a._id === cleanId || 
+      String(a.id).trim() === cleanId || 
+      String(a._id).trim() === cleanId
+    );
+
+    let deleted: any = null;
+
+    if (idx !== -1) {
+      deleted = memoryStore.assignments.splice(idx, 1)[0];
+    } else if (supabase) {
+      // Check Supabase directly if missing from local memoryStore array
+      try {
+        const { data: supaData } = await supabase.from('assignments').select('*').or(`id.eq.${cleanId},_id.eq.${cleanId}`).maybeSingle();
+        if (supaData) {
+          deleted = {
+            id: supaData.id,
+            projectId: supaData.project_id,
+            roleId: supaData.role_id,
+            memberId: supaData.member_id
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase deleteAssignment lookup notice:', err);
+      }
+    }
+
+    if (!deleted) {
+      // Fallback: search memoryStore by matching member or project
+      const matchIdx = memoryStore.assignments.findIndex(a => 
+        cleanId.includes(a.id) || (a.memberId && cleanId.includes(a.memberId))
+      );
+      if (matchIdx !== -1) {
+        deleted = memoryStore.assignments.splice(matchIdx, 1)[0];
+      }
+    }
+
+    if (!deleted) {
       return res.status(404).json({ success: false, message: 'Assignment record not found' });
     }
 
-    const deleted = memoryStore.assignments.splice(idx, 1)[0];
+    const deletedId = deleted.id || cleanId;
 
-    const ackIdx = memoryStore.acknowledgements.findIndex(k => k.assignmentId === id);
-    if (ackIdx !== -1) {
-      memoryStore.acknowledgements.splice(ackIdx, 1);
-    }
+    // 2. Remove any associated digital acknowledgement letters from memoryStore
+    memoryStore.acknowledgements = memoryStore.acknowledgements.filter(k => 
+      k.assignmentId !== deletedId && 
+      k.assignmentId !== cleanId && 
+      !(k.projectId === deleted.projectId && (k.memberId === deleted.memberId || k.memberId === deleted.memberEmail))
+    );
 
+    // 3. Remove assignment & acknowledgement from Supabase
     if (supabase) {
       try {
-        await supabase.from('assignments').delete().match({ id });
-        await supabase.from('acknowledgements').delete().match({ assignment_id: id });
+        await supabase.from('assignments').delete().or(`id.eq.${deletedId},id.eq.${cleanId}`);
+        await supabase.from('acknowledgements').delete().or(`assignment_id.eq.${deletedId},assignment_id.eq.${cleanId}`);
       } catch (err) {
         console.warn('Supabase deleteAssignment warning:', err);
       }
@@ -629,7 +696,7 @@ export const deleteAssignment = async (req: AuthenticatedRequest, res: Response)
       performedByName: req.user?.name || 'Admin',
       performedByRole: 'admin',
       targetType: 'ASSIGNMENT',
-      targetId: id,
+      targetId: deletedId,
       details: `Deleted role assignment for ${member?.name || 'Member'} in project "${project?.title || 'Project'}"`,
       timestamp: new Date().toISOString()
     });
