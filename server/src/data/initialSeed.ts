@@ -135,7 +135,28 @@ export const getInitialData = () => {
 
   const assignments = csvData.assignments.length > 0 ? csvData.assignments : [];
 
-  const acknowledgements: any[] = [];
+  const acknowledgements: any[] = assignments
+    .filter((a: any) => a.status === 'accepted')
+    .map((a: any, idx: number) => {
+      const user = users.find((u: any) => u.id === a.memberId);
+      return {
+        id: `ack-seed-${idx + 1}`,
+        _id: `ack-seed-${idx + 1}`,
+        assignmentId: a.id,
+        projectId: a.projectId,
+        roleId: a.roleId,
+        memberId: a.memberId,
+        signatureType: 'typed',
+        signatureData: 'Digital Signature Seed',
+        typedName: user?.name || 'Member',
+        ipAddress: '127.0.0.1 (Verified Session)',
+        userAgent: 'PRDAMS System Seed',
+        consentAccepted: true,
+        timestamp: '2026-02-15T10:00:00.000Z',
+        qrCodeHash: `PRDAMS-ACK-SEED${100 + idx}`,
+        pdfUrl: `/api/acknowledgements/verify/PRDAMS-ACK-SEED${100 + idx}`
+      };
+    });
   const notifications: any[] = [];
   const auditLogs: any[] = [
     {

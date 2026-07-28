@@ -2,23 +2,60 @@ import { Response } from 'express';
 import { memoryStore } from '../config/db.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
+function parseCSVProper(text: string): string[][] {
+  const rows: string[][] = [];
+  let currentField = '';
+  let currentRow: string[] = [];
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentField += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      currentRow.push(currentField);
+      currentField = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') i++;
+      currentRow.push(currentField);
+      if (currentRow.some(f => f.trim().length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+      currentField = '';
+    } else {
+      currentField += char;
+    }
+  }
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField);
+    if (currentRow.some(f => f.trim().length > 0)) rows.push(currentRow);
+  }
+  return rows;
+}
+
 // Simple robust CSV line parser
 function parseCSV(csvText: string): Record<string, string>[] {
-  const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
-  if (lines.length === 0) return [];
+  const rawRows = parseCSVProper(csvText);
+  if (rawRows.length === 0) return [];
 
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+  const headers = rawRows[0].map(h => h.trim().replace(/^["']|["']$/g, ''));
   const rows: Record<string, string>[] = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    // Regex to handle quoted CSV fields with commas inside quotes
-    const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
+  for (let i = 1; i < rawRows.length; i++) {
+    const values = rawRows[i];
     const row: Record<string, string> = {};
 
     headers.forEach((header, idx) => {
       let val = (values[idx] || '').trim().replace(/^["']|["']$/g, '');
       row[header] = val;
-      // Also save lowercased key for easy matching
       row[header.toLowerCase()] = val;
     });
 

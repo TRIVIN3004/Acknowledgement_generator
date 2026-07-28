@@ -4,6 +4,45 @@ import path from 'path';
 const csvPath = path.join(process.cwd(), '../users_rows.csv');
 const rootCsvPath = fs.existsSync(csvPath) ? csvPath : path.join(process.cwd(), 'users_rows.csv');
 
+function parseCSVProper(text: string): string[][] {
+  const rows: string[][] = [];
+  let currentField = '';
+  let currentRow: string[] = [];
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentField += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      currentRow.push(currentField);
+      currentField = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') i++;
+      currentRow.push(currentField);
+      if (currentRow.some(f => f.trim().length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+      currentField = '';
+    } else {
+      currentField += char;
+    }
+  }
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField);
+    if (currentRow.some(f => f.trim().length > 0)) rows.push(currentRow);
+  }
+  return rows;
+}
+
 export function parseUsersCsv() {
   if (!fs.existsSync(rootCsvPath)) {
     console.warn('⚠️ users_rows.csv not found at', rootCsvPath);
@@ -11,26 +50,25 @@ export function parseUsersCsv() {
   }
 
   const content = fs.readFileSync(rootCsvPath, 'utf-8');
-  const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
-  if (lines.length === 0) return { users: [], projects: [], assignments: [] };
+  const rawRows = parseCSVProper(content);
+  if (rawRows.length < 2) return { users: [], projects: [], assignments: [] };
 
   const parsedUsers: any[] = [];
   const projectTitleSet = new Set<string>();
   const userProjectPairs: { userId: string; userEmail: string; projectTitle: string }[] = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-    
+  for (let i = 1; i < rawRows.length; i++) {
+    const row = rawRows[i];
+
     // Columns: id,name,email,password,role,department,assignedProjects,avatar,phone,mustChangePassword
-    const empId = (matches[0] || '').replace(/"/g, '').trim();
-    const name = (matches[1] || '').replace(/"/g, '').trim();
-    const email = (matches[2] || '').replace(/"/g, '').trim();
-    const rawPass = (matches[3] || '').replace(/"/g, '').trim();
-    const role = (matches[4] || '').replace(/"/g, '').trim().toLowerCase() === 'admin' ? 'admin' : 'member';
-    const dept = (matches[5] || '').replace(/"/g, '').trim() || 'Software Engineering';
-    const rawProjects = (matches[6] || '').replace(/^"|"$/g, '').trim();
-    const phone = (matches[8] || '').replace(/"/g, '').trim() || '+1 (555) 019-2834';
+    const empId = (row[0] || '').trim();
+    const name = (row[1] || '').trim();
+    const email = (row[2] || '').trim();
+    const rawPass = (row[3] || '').trim();
+    const role = (row[4] || '').trim().toLowerCase() === 'admin' ? 'admin' : 'member';
+    const dept = (row[5] || '').trim() || 'Software Engineering';
+    const rawProjects = (row[6] || '').trim();
+    const phone = (row[8] || '').trim() || '+1 (555) 019-2834';
 
     if (!email || !name) continue;
 
@@ -49,7 +87,7 @@ export function parseUsersCsv() {
       skills: ['React', 'TypeScript', 'Node.js', 'AI Systems'],
       status: 'active',
       memberId: empId,
-      avatarUrl: '', // Profile picture removed as requested!
+      avatarUrl: '', // Profile picture removed
       createdAt: '2026-01-15T09:00:00.000Z'
     });
 
