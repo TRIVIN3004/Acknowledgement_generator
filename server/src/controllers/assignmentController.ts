@@ -568,6 +568,8 @@ export const updateAssignment = async (req: AuthenticatedRequest, res: Response)
       timestamp: new Date().toISOString()
     });
 
+    memoryStore.save();
+
     return res.json({
       success: true,
       message: `Role updated to "${role?.title || 'New Role'}" successfully`,
@@ -631,6 +633,8 @@ export const deleteAssignment = async (req: AuthenticatedRequest, res: Response)
       details: `Deleted role assignment for ${member?.name || 'Member'} in project "${project?.title || 'Project'}"`,
       timestamp: new Date().toISOString()
     });
+
+    memoryStore.save();
 
     return res.json({
       success: true,

@@ -143,11 +143,9 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
 
     if (supabase) {
       try {
-        const { data: supaData, error } = await supabase.from('acknowledgements').insert([{
-          assignment_id: newAck.assignmentId,
-          project_id: newAck.projectId,
-          role_id: newAck.roleId,
-          member_id: newAck.memberId,
+        const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str || '');
+        
+        const payload: any = {
           signature_type: newAck.signatureType,
           signature_data: newAck.signatureData,
           typed_name: newAck.typedName,
@@ -156,9 +154,18 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
           consent_accepted: true,
           qr_code_hash: newAck.qrCodeHash,
           pdf_url: newAck.pdfUrl
-        }]).select();
+        };
 
-        if (!error && supaData && supaData[0]) {
+        if (isUUID(newAck.assignmentId)) payload.assignment_id = newAck.assignmentId;
+        if (isUUID(newAck.projectId)) payload.project_id = newAck.projectId;
+        if (isUUID(newAck.roleId)) payload.role_id = newAck.roleId;
+        if (isUUID(newAck.memberId)) payload.member_id = newAck.memberId;
+
+        const { data: supaData, error } = await supabase.from('acknowledgements').insert([payload]).select();
+
+        if (error) {
+          console.warn('Supabase createAcknowledgement insert notice:', error.message);
+        } else if (supaData && supaData[0]) {
           newAck.id = supaData[0].id;
           newAck._id = supaData[0].id;
         }
@@ -167,13 +174,7 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
         await supabase.from('assignments').update({
           status: 'accepted',
           responded_at: new Date().toISOString()
-        }).eq('id', assignment.id);
-
-        // Fallback update by project, role, and member
-        await supabase.from('assignments').update({
-          status: 'accepted',
-          responded_at: new Date().toISOString()
-        }).eq('project_id', assignment.projectId).eq('role_id', assignment.roleId).eq('member_id', assignment.memberId);
+        }).or(`id.eq.${assignment.id},project_id.eq.${assignment.projectId}`);
 
       } catch (err) {
         console.warn('Supabase createAcknowledgement notice:', err);
@@ -203,6 +204,9 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
       details: `Digitally signed role acknowledgement for "${role?.title || 'Role'}" in "${project?.title || 'Project'}". Verification Hash: ${qrCodeHash}`,
       timestamp: new Date().toISOString()
     });
+
+    // Save to disk so signatures persist across restarts
+    memoryStore.save();
 
     return res.status(201).json({
       success: true,
