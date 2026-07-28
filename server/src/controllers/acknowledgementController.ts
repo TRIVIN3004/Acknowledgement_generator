@@ -126,7 +126,7 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
     const newAck: any = {
       id: `ack-${Date.now()}`,
       _id: `ack-${Date.now()}`,
-      assignmentId,
+      assignmentId: assignment.id,
       projectId: assignment.projectId,
       roleId: assignment.roleId,
       memberId: assignment.memberId,
@@ -163,11 +163,18 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
           newAck._id = supaData[0].id;
         }
 
-        // Also update assignment status to accepted in Supabase
+        // Update assignment in Supabase setting status to accepted
         await supabase.from('assignments').update({
           status: 'accepted',
           responded_at: new Date().toISOString()
-        }).match({ id: assignment.id });
+        }).eq('id', assignment.id);
+
+        // Fallback update by project, role, and member
+        await supabase.from('assignments').update({
+          status: 'accepted',
+          responded_at: new Date().toISOString()
+        }).eq('project_id', assignment.projectId).eq('role_id', assignment.roleId).eq('member_id', assignment.memberId);
+
       } catch (err) {
         console.warn('Supabase createAcknowledgement notice:', err);
       }
@@ -179,7 +186,8 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
     assignment.status = 'accepted';
     assignment.respondedAt = new Date().toISOString();
 
-    if (project && !project.timeline.acceptedAt) {
+    if (project && (!project.timeline || !project.timeline.acceptedAt)) {
+      if (!project.timeline) project.timeline = {};
       project.timeline.acceptedAt = new Date().toISOString();
     }
 

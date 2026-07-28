@@ -15,6 +15,25 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
           supabase.from('acknowledgements').select('*')
         ]);
 
+        if (usersRes.data) {
+          usersRes.data.forEach((u: any) => {
+            const formatted = {
+              id: u.id,
+              _id: u.id,
+              name: u.name,
+              email: u.email,
+              role: u.role || 'member',
+              department: u.department,
+              college: u.college,
+              memberId: u.member_id,
+              avatarUrl: u.avatar_url
+            };
+            const idx = memoryStore.users.findIndex(x => x.email.toLowerCase() === (u.email || '').toLowerCase() || x.id === u.id);
+            if (idx !== -1) memoryStore.users[idx] = { ...memoryStore.users[idx], ...formatted };
+            else memoryStore.users.push(formatted);
+          });
+        }
+
         if (projRes.data) {
           projRes.data.forEach((p: any) => {
             const formatted = {
@@ -36,8 +55,56 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
           });
         }
 
+        if (rolesRes.data) {
+          rolesRes.data.forEach((r: any) => {
+            const formatted = {
+              id: r.id,
+              _id: r.id,
+              title: r.title,
+              category: r.category || 'Engineering',
+              department: r.department || 'Software Development',
+              responsibilities: r.responsibilities || [],
+              requiredSkills: r.required_skills || [],
+              description: r.description || `Role ${r.title}`
+            };
+            const idx = memoryStore.roles.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.roles[idx] = formatted;
+            else memoryStore.roles.unshift(formatted);
+          });
+        }
+
+        if (ackRes.data) {
+          ackRes.data.forEach((k: any) => {
+            const formatted = {
+              id: k.id,
+              _id: k.id,
+              assignmentId: k.assignment_id,
+              projectId: k.project_id,
+              roleId: k.role_id,
+              memberId: k.member_id,
+              signatureType: k.signature_type,
+              signatureData: k.signature_data,
+              typedName: k.typed_name,
+              ipAddress: k.ip_address,
+              timestamp: k.timestamp,
+              qrCodeHash: k.qr_code_hash
+            };
+            const idx = memoryStore.acknowledgements.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.acknowledgements[idx] = formatted;
+            else memoryStore.acknowledgements.unshift(formatted);
+          });
+        }
+
         if (asgnRes.data) {
           asgnRes.data.forEach((a: any) => {
+            const hasAck = ackRes.data?.some((k: any) => 
+              k.assignment_id === a.id || 
+              (k.project_id === a.project_id && k.role_id === a.role_id && k.member_id === a.member_id)
+            ) || memoryStore.acknowledgements.some((k: any) => 
+              k.assignmentId === a.id || 
+              (k.projectId === a.project_id && k.roleId === a.role_id && k.memberId === a.member_id)
+            );
+
             const formatted = {
               id: a.id,
               _id: a.id,
@@ -45,7 +112,7 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
               roleId: a.role_id,
               memberId: a.member_id,
               assignedBy: a.assigned_by,
-              status: a.status || 'pending',
+              status: hasAck ? 'accepted' : (a.status || 'pending'),
               changeNote: a.change_note,
               assignedAt: a.assigned_at || a.created_at || new Date().toISOString()
             };
@@ -62,7 +129,17 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
     const totalProjects = memoryStore.projects.length;
     const totalMembers = memoryStore.users.filter(u => u.role === 'member').length;
     const totalRoles = memoryStore.roles.length;
-    const pendingAcknowledgements = memoryStore.assignments.filter(a => a.status === 'pending').length;
+
+    // Filter assignments that have a corresponding signed acknowledgement
+    const isAccepted = (a: any) => {
+      if (a.status === 'accepted') return true;
+      return memoryStore.acknowledgements.some(k => 
+        k.assignmentId === a.id || 
+        (k.projectId === a.projectId && k.roleId === a.roleId && k.memberId === a.memberId)
+      );
+    };
+
+    const pendingAcknowledgements = memoryStore.assignments.filter(a => !isAccepted(a) && a.status !== 'rejected').length;
     const completedAcknowledgements = memoryStore.acknowledgements.length;
 
     // Members per project calculation
@@ -95,7 +172,7 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
 
     // Acceptance rate
     const totalAssignments = memoryStore.assignments.length;
-    const acceptedCount = memoryStore.assignments.filter(a => a.status === 'accepted').length;
+    const acceptedCount = memoryStore.assignments.filter(a => isAccepted(a)).length;
     const acceptanceRate = totalAssignments > 0 ? Math.round((acceptedCount / totalAssignments) * 100) : 100;
 
     return res.json({
@@ -126,11 +203,32 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
 
     if (supabase) {
       try {
-        const [projRes, asgnRes, ackRes] = await Promise.all([
+        const [usersRes, projRes, rolesRes, asgnRes, ackRes] = await Promise.all([
+          supabase.from('users').select('*'),
           supabase.from('projects').select('*'),
+          supabase.from('roles').select('*'),
           supabase.from('assignments').select('*'),
           supabase.from('acknowledgements').select('*')
         ]);
+
+        if (usersRes.data) {
+          usersRes.data.forEach((u: any) => {
+            const formatted = {
+              id: u.id,
+              _id: u.id,
+              name: u.name,
+              email: u.email,
+              role: u.role || 'member',
+              department: u.department,
+              college: u.college,
+              memberId: u.member_id,
+              avatarUrl: u.avatar_url
+            };
+            const idx = memoryStore.users.findIndex(x => x.email.toLowerCase() === (u.email || '').toLowerCase() || x.id === u.id);
+            if (idx !== -1) memoryStore.users[idx] = { ...memoryStore.users[idx], ...formatted };
+            else memoryStore.users.push(formatted);
+          });
+        }
 
         if (projRes.data) {
           projRes.data.forEach((p: any) => {
@@ -153,8 +251,56 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
           });
         }
 
+        if (rolesRes.data) {
+          rolesRes.data.forEach((r: any) => {
+            const formatted = {
+              id: r.id,
+              _id: r.id,
+              title: r.title,
+              category: r.category || 'Engineering',
+              department: r.department || 'Software Development',
+              responsibilities: r.responsibilities || [],
+              requiredSkills: r.required_skills || [],
+              description: r.description || `Role ${r.title}`
+            };
+            const idx = memoryStore.roles.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.roles[idx] = formatted;
+            else memoryStore.roles.unshift(formatted);
+          });
+        }
+
+        if (ackRes.data) {
+          ackRes.data.forEach((k: any) => {
+            const formatted = {
+              id: k.id,
+              _id: k.id,
+              assignmentId: k.assignment_id,
+              projectId: k.project_id,
+              roleId: k.role_id,
+              memberId: k.member_id,
+              signatureType: k.signature_type,
+              signatureData: k.signature_data,
+              typedName: k.typed_name,
+              ipAddress: k.ip_address,
+              timestamp: k.timestamp,
+              qrCodeHash: k.qr_code_hash
+            };
+            const idx = memoryStore.acknowledgements.findIndex(x => x.id === formatted.id);
+            if (idx !== -1) memoryStore.acknowledgements[idx] = formatted;
+            else memoryStore.acknowledgements.unshift(formatted);
+          });
+        }
+
         if (asgnRes.data) {
           asgnRes.data.forEach((a: any) => {
+            const hasAck = ackRes.data?.some((k: any) => 
+              k.assignment_id === a.id || 
+              (k.project_id === a.project_id && k.role_id === a.role_id && k.member_id === a.member_id)
+            ) || memoryStore.acknowledgements.some((k: any) => 
+              k.assignmentId === a.id || 
+              (k.projectId === a.project_id && k.roleId === a.role_id && k.memberId === a.member_id)
+            );
+
             const formatted = {
               id: a.id,
               _id: a.id,
@@ -162,7 +308,7 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
               roleId: a.role_id,
               memberId: a.member_id,
               assignedBy: a.assigned_by,
-              status: a.status || 'pending',
+              status: hasAck ? 'accepted' : (a.status || 'pending'),
               changeNote: a.change_note,
               assignedAt: a.assigned_at || a.created_at || new Date().toISOString()
             };
@@ -187,14 +333,25 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
 
     const myAssignments = memoryStore.assignments.filter(a => {
       if (validUserIds.has(a.memberId)) return true;
-      const assignedUser = memoryStore.users.find(u => u.id === a.memberId);
+      const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
       return assignedUser && validUserIds.has(assignedUser.email);
     });
 
-    const myAcks = memoryStore.acknowledgements.filter(a => validUserIds.has(a.memberId));
+    const myAcks = memoryStore.acknowledgements.filter(a => {
+      if (validUserIds.has(a.memberId)) return true;
+      if (validUserIds.has(a.typedName)) return true;
+      return false;
+    });
 
     const pendingAssignments = myAssignments
-      .filter(a => a.status === 'pending')
+      .filter(a => {
+        if (a.status === 'accepted') return false;
+        const hasAck = memoryStore.acknowledgements.some(k => 
+          k.assignmentId === a.id || 
+          (k.projectId === a.projectId && k.roleId === a.roleId)
+        );
+        return !hasAck;
+      })
       .map(a => {
         const project = memoryStore.projects.find(p => p.id === a.projectId);
         const role = memoryStore.roles.find(r => r.id === a.roleId);
