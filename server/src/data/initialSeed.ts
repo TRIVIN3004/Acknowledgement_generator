@@ -62,7 +62,8 @@ export const getInitialData = () => {
     }
   ];
 
-  const projects = csvData.projects.length > 0 ? csvData.projects : fallbackProjects;
+  const projects: any[] = [];
+  const assignments: any[] = [];
 
   const roles = [
     {
@@ -132,8 +133,6 @@ export const getInitialData = () => {
       description: 'Guarantees software quality and product reliability.'
     }
   ];
-
-  const assignments = csvData.assignments.length > 0 ? csvData.assignments : [];
 
   const acknowledgements: any[] = [];
   const notifications: any[] = [];
