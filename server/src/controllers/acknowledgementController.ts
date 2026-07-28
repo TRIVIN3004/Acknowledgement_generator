@@ -170,11 +170,11 @@ export const createAcknowledgement = async (req: AuthenticatedRequest, res: Resp
           newAck._id = supaData[0].id;
         }
 
-        // Update assignment in Supabase setting status to accepted
+        // Update assignment in Supabase setting status to accepted for this specific assignment
         await supabase.from('assignments').update({
           status: 'accepted',
           responded_at: new Date().toISOString()
-        }).or(`id.eq.${assignment.id},project_id.eq.${assignment.projectId}`);
+        }).match({ id: assignment.id });
 
       } catch (err) {
         console.warn('Supabase createAcknowledgement notice:', err);

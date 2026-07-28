@@ -97,12 +97,11 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
 
         if (asgnRes.data) {
           asgnRes.data.forEach((a: any) => {
-            const hasAck = ackRes.data?.some((k: any) => 
-              k.assignment_id === a.id || 
-              (k.project_id === a.project_id && k.role_id === a.role_id && k.member_id === a.member_id)
-            ) || memoryStore.acknowledgements.some((k: any) => 
-              k.assignmentId === a.id || 
-              (k.projectId === a.project_id && k.roleId === a.role_id && k.memberId === a.member_id)
+            const hasAck = Boolean(
+              a.id && (
+                ackRes.data?.some((k: any) => k.assignment_id === a.id) || 
+                memoryStore.acknowledgements.some((k: any) => k.assignmentId === a.id)
+              )
             );
 
             const formatted = {
@@ -289,12 +288,11 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
 
         if (asgnRes.data) {
           asgnRes.data.forEach((a: any) => {
-            const hasAck = ackRes.data?.some((k: any) => 
-              k.assignment_id === a.id || 
-              (k.project_id === a.project_id && k.role_id === a.role_id && k.member_id === a.member_id)
-            ) || memoryStore.acknowledgements.some((k: any) => 
-              k.assignmentId === a.id || 
-              (k.projectId === a.project_id && k.roleId === a.role_id && k.memberId === a.member_id)
+            const hasAck = Boolean(
+              a.id && (
+                ackRes.data?.some((k: any) => k.assignment_id === a.id) || 
+                memoryStore.acknowledgements.some((k: any) => k.assignmentId === a.id)
+              )
             );
 
             const formatted = {
@@ -361,9 +359,8 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
     const pendingAssignments = myAssignments
       .filter(a => {
         if (a.status === 'accepted') return false;
-        const hasAck = memoryStore.acknowledgements.some(k => 
-          k.assignmentId === a.id || 
-          (k.projectId === a.projectId && k.roleId === a.roleId)
+        const hasAck = Boolean(
+          a.id && memoryStore.acknowledgements.some(k => k.assignmentId === a.id)
         );
         return !hasAck;
       })
