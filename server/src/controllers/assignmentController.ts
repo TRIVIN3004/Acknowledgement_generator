@@ -172,7 +172,14 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
       const project = memoryStore.projects.find(p => p.id === a.projectId);
       const role = memoryStore.roles.find(r => r.id === a.roleId);
       const member = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
-      const ack = memoryStore.acknowledgements.find(k => k.assignmentId === a.id);
+      const rawAck = memoryStore.acknowledgements.find(k => k.assignmentId === a.id);
+      
+      const ack = rawAck ? {
+        ...rawAck,
+        project,
+        role,
+        member: member ? { id: member.id, name: member.name, email: member.email, memberId: member.memberId, department: member.department, college: member.college } : null
+      } : null;
 
       return {
         ...a,
@@ -183,7 +190,7 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
         project,
         role,
         member: member ? { id: member.id, name: member.name, email: member.email, avatarUrl: member.avatarUrl, department: member.department, college: member.college } : null,
-        acknowledgement: ack || null
+        acknowledgement: ack
       };
     });
 
