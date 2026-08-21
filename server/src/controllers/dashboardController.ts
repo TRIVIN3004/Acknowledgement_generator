@@ -50,7 +50,7 @@ export const getAdminStats = async (req: AuthenticatedRequest, res: Response) =>
               createdAt: p.created_at || new Date().toISOString()
             };
             const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
-            if (idx !== -1) memoryStore.projects[idx] = { ...formatted, ...memoryStore.projects[idx] };
+            if (idx !== -1) memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
             else memoryStore.projects.unshift(formatted);
           });
         }
@@ -241,7 +241,7 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
               createdAt: p.created_at || new Date().toISOString()
             };
             const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
-            if (idx !== -1) memoryStore.projects[idx] = { ...formatted, ...memoryStore.projects[idx] };
+            if (idx !== -1) memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
             else memoryStore.projects.unshift(formatted);
           });
         }

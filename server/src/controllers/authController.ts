@@ -139,6 +139,7 @@ export const register = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     memoryStore.users.push(newUser);
+    memoryStore.save();
 
     // Audit log
     memoryStore.auditLogs.unshift({
@@ -244,6 +245,8 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
       }
     }
 
+    memoryStore.save();
+
     const { passwordHash, ...cleanUser } = user;
     return res.json({ success: true, message: 'Profile updated successfully', user: cleanUser });
   } catch (error: any) {
@@ -327,6 +330,8 @@ export const updateMemberStatus = async (req: AuthenticatedRequest, res: Respons
       timestamp: new Date().toISOString()
     });
 
+    memoryStore.save();
+
     const { passwordHash, ...cleanUser } = user;
     return res.json({ success: true, message: `Member status updated to ${status}`, member: cleanUser });
   } catch (error: any) {
@@ -363,6 +368,8 @@ export const deleteMember = async (req: AuthenticatedRequest, res: Response) => 
       details: `Removed team member ${removed.name} (${removed.email})`,
       timestamp: new Date().toISOString()
     });
+
+    memoryStore.save();
 
     return res.json({ success: true, message: 'Member removed successfully' });
   } catch (error: any) {

@@ -310,11 +310,14 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
 
     if (supabase) {
       try {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const isAssignedByUuid = uuidRegex.test(newAssignment.assignedBy || '');
+
         const { data: supaData, error } = await supabase.from('assignments').insert([{
           project_id: newAssignment.projectId,
           role_id: newAssignment.roleId,
           member_id: newAssignment.memberId,
-          assigned_by: newAssignment.assignedBy,
+          assigned_by: isAssignedByUuid ? newAssignment.assignedBy : null,
           status: newAssignment.status,
           assigned_at: newAssignment.assignedAt
         }]).select();
@@ -322,6 +325,8 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
         if (!error && supaData && supaData[0]) {
           newAssignment.id = supaData[0].id;
           newAssignment._id = supaData[0].id;
+        } else if (error) {
+          console.warn('Supabase createAssignment insert error details:', error);
         }
       } catch (err) {
         console.warn('Supabase createAssignment notice:', err);
@@ -371,6 +376,8 @@ export const createAssignment = async (req: AuthenticatedRequest, res: Response)
       details: `Assigned ${member.name} as ${role.title} in project "${project.title}"`,
       timestamp: new Date().toISOString()
     });
+
+    memoryStore.save();
 
     return res.status(201).json({
       success: true,
@@ -461,6 +468,8 @@ export const respondToAssignment = async (req: AuthenticatedRequest, res: Respon
         }
       }
     }
+
+    memoryStore.save();
 
     return res.json({ success: true, message: `Assignment ${action}ed successfully`, assignment });
   } catch (error: any) {

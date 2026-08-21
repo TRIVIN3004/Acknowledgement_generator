@@ -33,7 +33,7 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
 
             const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
             if (idx !== -1) {
-              memoryStore.projects[idx] = { ...formatted, ...memoryStore.projects[idx] };
+              memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
             } else {
               memoryStore.projects.unshift(formatted);
             }
@@ -151,6 +151,7 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
     }
 
     memoryStore.projects.unshift(newProject);
+    memoryStore.save();
 
     memoryStore.auditLogs.unshift({
       id: `log-${Date.now()}`,
@@ -232,6 +233,8 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response) =>
       timestamp: new Date().toISOString()
     });
 
+    memoryStore.save();
+
     return res.json({ success: true, message: 'Project updated successfully', project });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -269,6 +272,8 @@ export const archiveProject = async (req: AuthenticatedRequest, res: Response) =
       timestamp: new Date().toISOString()
     });
 
+    memoryStore.save();
+
     return res.json({ success: true, message: 'Project archived successfully', project });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -305,6 +310,8 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response) =>
       details: `Deleted project "${deleted.title}"`,
       timestamp: new Date().toISOString()
     });
+
+    memoryStore.save();
 
     return res.json({ success: true, message: 'Project deleted successfully' });
   } catch (error: any) {

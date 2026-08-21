@@ -95,6 +95,7 @@ export const createRole = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     memoryStore.roles.unshift(newRole);
+    memoryStore.save();
 
     memoryStore.auditLogs.unshift({
       id: `log-${Date.now()}`,
@@ -157,6 +158,8 @@ export const updateRole = async (req: AuthenticatedRequest, res: Response) => {
       }
     }
 
+    memoryStore.save();
+
     return res.json({ success: true, message: 'Role updated successfully', role });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -181,6 +184,8 @@ export const deleteRole = async (req: AuthenticatedRequest, res: Response) => {
         console.warn('Supabase deleteRole notice:', err);
       }
     }
+
+    memoryStore.save();
 
     return res.json({ success: true, message: `Role "${deleted.title}" deleted successfully` });
   } catch (error: any) {
