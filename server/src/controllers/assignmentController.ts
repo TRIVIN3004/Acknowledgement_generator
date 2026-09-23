@@ -18,7 +18,8 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
         u => u.id === targetMemberQuery || 
              u.email.toLowerCase() === String(targetMemberQuery).toLowerCase() ||
              u.id === currentUser?.id ||
-             u.email.toLowerCase() === currentUser?.email?.toLowerCase()
+             u.email.toLowerCase() === currentUser?.email?.toLowerCase() ||
+             (currentUser?.name && u.name.toLowerCase() === currentUser.name.toLowerCase())
       );
 
       const targetEmails = new Set([
@@ -34,13 +35,23 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
         String(targetMemberQuery)
       ].filter(Boolean));
 
+      const targetNames = new Set([
+        currentUser?.name?.toLowerCase(),
+        matchedUser?.name?.toLowerCase()
+      ].filter(Boolean));
+
       list = list.filter(a => {
         if (targetIds.has(a.memberId)) return true;
         if (targetEmails.has(String(a.memberId).toLowerCase())) return true;
-        const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
+        const assignedUser = memoryStore.users.find(u => 
+          u.id === a.memberId || 
+          u.email.toLowerCase() === String(a.memberId).toLowerCase() ||
+          u.name.toLowerCase() === String(a.memberId).toLowerCase()
+        );
         if (assignedUser) {
           if (targetEmails.has(assignedUser.email.toLowerCase())) return true;
           if (targetIds.has(assignedUser.id)) return true;
+          if (targetNames.has(assignedUser.name.toLowerCase())) return true;
         }
         return false;
       });
@@ -50,26 +61,33 @@ export const getAssignments = async (req: AuthenticatedRequest, res: Response) =
 
     // Populate relations
     const enriched = list.map(a => {
-      const project = memoryStore.projects.find(p => p.id === a.projectId);
-      const role = memoryStore.roles.find(r => r.id === a.roleId);
-      const member = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
-      const rawAck = memoryStore.acknowledgements.find(k => k.assignmentId === a.id);
+      const project = memoryStore.projects.find(p => p.id === a.projectId || p.title === a.projectId);
+      const role = memoryStore.roles.find(r => r.id === a.roleId || r.title === a.roleId);
+      const member = memoryStore.users.find(u => 
+        u.id === a.memberId || 
+        u.email.toLowerCase() === String(a.memberId).toLowerCase() ||
+        u.name.toLowerCase() === String(a.memberId).toLowerCase()
+      );
+      const rawAck = memoryStore.acknowledgements.find(k => 
+        k.assignmentId === a.id || 
+        (k.projectId === a.projectId && k.roleId === a.roleId && k.memberId === a.memberId)
+      );
       
       const ack = rawAck ? {
         ...rawAck,
-        project,
-        role,
+        project: project || rawAck.project,
+        role: role || rawAck.role,
         member: member ? { id: member.id, name: member.name, email: member.email, memberId: member.memberId, department: member.department, college: member.college } : null
       } : null;
 
       return {
         ...a,
-        projectTitle: project?.title || 'Unknown Project',
-        roleTitle: role?.title || 'Unknown Role',
-        memberName: member?.name || 'Unknown Member',
-        memberEmail: member?.email,
-        project,
-        role,
+        projectTitle: project?.title || a.projectTitle || 'Unknown Project',
+        roleTitle: role?.title || a.roleTitle || 'Unknown Role',
+        memberName: member?.name || a.memberName || 'Unknown Member',
+        memberEmail: member?.email || a.memberEmail,
+        project: project || { id: a.projectId, title: a.projectTitle || 'Project', description: '' },
+        role: role || { id: a.roleId, title: a.roleTitle || 'Role' },
         member: member ? { id: member.id, name: member.name, email: member.email, avatarUrl: member.avatarUrl, department: member.department, college: member.college } : null,
         acknowledgement: ack
       };

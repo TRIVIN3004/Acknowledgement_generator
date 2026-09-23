@@ -77,17 +77,24 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
 
     const targetUser = memoryStore.users.find(u => 
       u.id === user.id || 
-      u.email.toLowerCase() === (user.email || '').toLowerCase()
+      u.email?.toLowerCase() === (user.email || '').toLowerCase() ||
+      (user.name && u.name.toLowerCase() === user.name.toLowerCase())
     );
 
     const validUserIds = new Set([
       user.id,
       user.email,
       (user.email || '').toLowerCase(),
+      user.name,
+      (user.name || '').toLowerCase(),
       targetUser?.id,
       targetUser?._id,
       targetUser?.email,
-      targetUser?.email?.toLowerCase()
+      targetUser?.email?.toLowerCase(),
+      targetUser?.name,
+      targetUser?.name?.toLowerCase(),
+      targetUser?.memberId,
+      (targetUser?.memberId || '').toLowerCase()
     ].filter(Boolean));
 
     const myAssignments = memoryStore.assignments.filter(a => {
@@ -95,11 +102,13 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
       if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
       const assignedUser = memoryStore.users.find(u => 
         u.id === a.memberId || 
-        u.email.toLowerCase() === String(a.memberId).toLowerCase()
+        u.email?.toLowerCase() === String(a.memberId).toLowerCase() ||
+        u.name?.toLowerCase() === String(a.memberId).toLowerCase()
       );
       if (assignedUser) {
-        if (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email.toLowerCase())) return true;
+        if (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email?.toLowerCase())) return true;
         if (validUserIds.has(assignedUser.id)) return true;
+        if (validUserIds.has(assignedUser.name) || validUserIds.has(assignedUser.name?.toLowerCase())) return true;
       }
       return false;
     });
@@ -107,11 +116,17 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
     const myAcks = memoryStore.acknowledgements.filter(a => {
       if (validUserIds.has(a.memberId)) return true;
       if (validUserIds.has(String(a.memberId).toLowerCase())) return true;
+      if (a.typedName && validUserIds.has(a.typedName.toLowerCase())) return true;
       const assignedUser = memoryStore.users.find(u => 
         u.id === a.memberId || 
-        u.email.toLowerCase() === String(a.memberId).toLowerCase()
+        u.email?.toLowerCase() === String(a.memberId).toLowerCase() ||
+        (a.typedName && u.name?.toLowerCase() === a.typedName.toLowerCase())
       );
-      if (assignedUser && (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email.toLowerCase()))) return true;
+      if (assignedUser) {
+        if (validUserIds.has(assignedUser.email) || validUserIds.has(assignedUser.email?.toLowerCase())) return true;
+        if (validUserIds.has(assignedUser.id)) return true;
+        if (validUserIds.has(assignedUser.name) || validUserIds.has(assignedUser.name?.toLowerCase())) return true;
+      }
       return false;
     });
 
@@ -124,13 +139,19 @@ export const getMemberStats = async (req: AuthenticatedRequest, res: Response) =
         return !hasAck;
       })
       .map(a => {
-        const project = memoryStore.projects.find(p => p.id === a.projectId);
-        const role = memoryStore.roles.find(r => r.id === a.roleId);
-        return { ...a, project, role };
+        const project = memoryStore.projects.find(p => p.id === a.projectId || p.title === a.projectId);
+        const role = memoryStore.roles.find(r => r.id === a.roleId || r.title === a.roleId);
+        return { 
+          ...a, 
+          project: project || { id: a.projectId, title: 'Nexora Project', description: 'Enterprise Project' }, 
+          role: role || { id: a.roleId, title: 'Software Developer' } 
+        };
       });
 
     const activeProjectIds = [...new Set(myAssignments.map(a => a.projectId))];
-    const activeProjects = memoryStore.projects.filter(p => activeProjectIds.includes(p.id));
+    const activeProjects = memoryStore.projects.filter(p => 
+      activeProjectIds.includes(p.id) || activeProjectIds.includes(p.title)
+    );
 
     return res.json({
       success: true,

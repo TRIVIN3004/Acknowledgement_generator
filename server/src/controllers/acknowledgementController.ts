@@ -234,7 +234,8 @@ export const getAcknowledgements = async (req: AuthenticatedRequest, res: Respon
         u => u.id === targetMemberQuery || 
              u.email.toLowerCase() === String(targetMemberQuery).toLowerCase() ||
              u.id === currentUser?.id ||
-             u.email.toLowerCase() === currentUser?.email?.toLowerCase()
+             u.email.toLowerCase() === currentUser?.email?.toLowerCase() ||
+             (currentUser?.name && u.name.toLowerCase() === currentUser.name.toLowerCase())
       );
 
       const targetEmails = new Set([
@@ -250,13 +251,24 @@ export const getAcknowledgements = async (req: AuthenticatedRequest, res: Respon
         String(targetMemberQuery)
       ].filter(Boolean));
 
+      const targetNames = new Set([
+        currentUser?.name?.toLowerCase(),
+        matchedUser?.name?.toLowerCase()
+      ].filter(Boolean));
+
       list = list.filter(a => {
         if (targetIds.has(a.memberId)) return true;
         if (targetEmails.has(String(a.memberId).toLowerCase())) return true;
-        const assignedUser = memoryStore.users.find(u => u.id === a.memberId || u.email.toLowerCase() === String(a.memberId).toLowerCase());
+        if (a.typedName && targetNames.has(a.typedName.toLowerCase())) return true;
+        const assignedUser = memoryStore.users.find(u => 
+          u.id === a.memberId || 
+          u.email.toLowerCase() === String(a.memberId).toLowerCase() ||
+          (a.typedName && u.name.toLowerCase() === a.typedName.toLowerCase())
+        );
         if (assignedUser) {
           if (targetEmails.has(assignedUser.email.toLowerCase())) return true;
           if (targetIds.has(assignedUser.id)) return true;
+          if (targetNames.has(assignedUser.name.toLowerCase())) return true;
         }
         return false;
       });
@@ -264,25 +276,47 @@ export const getAcknowledgements = async (req: AuthenticatedRequest, res: Respon
 
     const enriched = list.map(ack => {
       const assignment = memoryStore.assignments.find(a => a.id === ack.assignmentId);
-      const project = memoryStore.projects.find(p => p.id === ack.projectId || p.id === assignment?.projectId);
-      const role = memoryStore.roles.find(r => r.id === ack.roleId || r.id === assignment?.roleId);
-      const member = memoryStore.users.find(u => u.id === ack.memberId || u.id === assignment?.memberId || u.email.toLowerCase() === String(ack.memberId).toLowerCase());
+      const project = memoryStore.projects.find(p => p.id === ack.projectId || p.id === assignment?.projectId || p.title === ack.projectId);
+      const role = memoryStore.roles.find(r => r.id === ack.roleId || r.id === assignment?.roleId || r.title === ack.roleId);
+      const member = memoryStore.users.find(u => 
+        u.id === ack.memberId || 
+        u.id === assignment?.memberId || 
+        u.email.toLowerCase() === String(ack.memberId).toLowerCase() ||
+        (ack.typedName && u.name.toLowerCase() === ack.typedName.toLowerCase())
+      );
 
       return {
         ...ack,
         project: project || {
-          title: 'Nexora AI Platform',
-          description: 'Enterprise AI & Software Engineering Platform.',
+          id: ack.projectId || 'proj-gen',
+          title: 'Nexora Software Platform',
+          description: 'Enterprise AI & Software Engineering Platform developed by Nexora Technologies.',
           category: 'Software Engineering',
-          technologyStack: ['React', 'TypeScript', 'Node.js', 'Python'],
+          technologyStack: ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
           deadline: '2026-12-31'
         },
         role: role || {
-          title: 'Software Engineer',
+          id: ack.roleId || 'role-gen',
+          title: 'Software Developer',
+          category: 'Engineering',
           department: 'Engineering',
-          responsibilities: ['Architect and build scalable web components', 'Ensure high system performance and digital signature verification']
+          responsibilities: ['Architect and develop scalable system components', 'Ensure verified digital signature compliance and performance']
         },
-        member: member ? { id: member.id, name: member.name, email: member.email, memberId: member.memberId, department: member.department, college: member.college } : null,
+        member: member ? { 
+          id: member.id, 
+          name: member.name, 
+          email: member.email, 
+          memberId: member.memberId || 'DEV-101', 
+          department: member.department || 'Engineering', 
+          college: member.college || 'Nexora Technologies' 
+        } : {
+          id: ack.memberId || 'usr-gen',
+          name: ack.typedName || 'Signatory Member',
+          email: '',
+          memberId: 'EMP-VERIFIED',
+          department: 'Engineering',
+          college: 'Nexora Technologies'
+        },
         assignment
       };
     });
