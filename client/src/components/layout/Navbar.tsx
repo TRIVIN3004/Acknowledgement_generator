@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, 
   Bell, 
@@ -10,7 +10,16 @@ import {
   LogOut, 
   Sparkles,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  Menu,
+  X,
+  LayoutDashboard,
+  FolderKanban,
+  Briefcase,
+  Users,
+  FileCheck,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -19,11 +28,36 @@ import { SystemNotification } from '../../types';
 export const Navbar: React.FC = () => {
   const { user, logout, darkMode, toggleDarkMode } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [globalQuery, setGlobalQuery] = useState('');
+
+  const isAdmin = user?.role === 'admin';
+
+  const adminNav = [
+    { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Projects', path: '/admin/projects', icon: FolderKanban },
+    { label: 'Roles', path: '/admin/roles', icon: Briefcase },
+    { label: 'Members', path: '/admin/members', icon: Users },
+    { label: 'Acknowledgements', path: '/admin/acknowledgements', icon: FileCheck },
+  ];
+
+  const memberNav = [
+    { label: 'Dashboard', path: '/member/dashboard', icon: LayoutDashboard },
+    { label: 'Assigned Roles', path: '/member/roles', icon: UserCheck },
+    { label: 'My Letters', path: '/member/letters', icon: FileText },
+    { label: 'Profile', path: '/member/profile', icon: UserIcon },
+  ];
+
+  const navLinks = isAdmin ? adminNav : memberNav;
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (user) {
@@ -56,63 +90,75 @@ export const Navbar: React.FC = () => {
     } else {
       navigate(`/member/projects?search=${encodeURIComponent(globalQuery)}`);
     }
+    setMobileMenuOpen(false);
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+    <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left: Brand Logo */}
+          {/* Left: Brand Logo & Mobile Toggle */}
           <div className="flex items-center gap-3">
-            <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/member/dashboard'} className="flex items-center gap-3 group">
+            {user && (
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
+                aria-label="Toggle Navigation Menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            )}
+
+            <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/member/dashboard'} className="flex items-center gap-2.5 group">
               <div className="h-10 px-2 py-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <img src="/logo.png" alt="Nexora Technologies Logo" className="h-8 object-contain" />
               </div>
               <div>
                 <span className="text-base font-black tracking-tight bg-gradient-to-r from-brand-600 via-sky-500 to-indigo-600 bg-clip-text text-transparent dark:from-brand-400 dark:to-sky-300">
-                  NEXORA TECHNOLOGIES
+                  NEXORA
                 </span>
-                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                  Building Tomorrow, Today
+                <span className="hidden sm:block text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                  Technologies
                 </span>
               </div>
             </Link>
 
-            <span className="hidden md:inline-flex items-center gap-1.5 ml-4 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50">
+            <span className="hidden lg:inline-flex items-center gap-1.5 ml-3 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50">
               <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-              Enterprise v2.4
+              Enterprise Portal
             </span>
           </div>
 
           {/* Center: Global Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
             <form onSubmit={handleGlobalSearch} className="w-full relative">
               <input
                 type="text"
-                placeholder="Search projects, roles, members, or hashes..."
+                placeholder="Search projects, roles, members, or letters..."
                 value={globalQuery}
                 onChange={e => setGlobalQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 rounded-xl text-sm bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                className="w-full pl-10 pr-4 py-1.5 rounded-xl text-xs bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
             </form>
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Verification Link */}
             <Link
               to="/verify/demo"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              Verify QR
+              Verify Certificate
             </Link>
 
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title="Toggle Dark/Light Mode"
             >
               {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
@@ -123,7 +169,7 @@ export const Navbar: React.FC = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                  className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
@@ -134,7 +180,7 @@ export const Navbar: React.FC = () => {
                 </button>
 
                 {showNotifDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                       <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Notifications</span>
                       <span className="text-[11px] font-semibold text-brand-600 dark:text-brand-400">{unreadCount} Unread</span>
@@ -170,7 +216,7 @@ export const Navbar: React.FC = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-2 p-1 sm:p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   <img
                     src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
@@ -183,7 +229,7 @@ export const Navbar: React.FC = () => {
                       {user.role}
                     </p>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                 </button>
 
                 {showProfileDropdown && (
@@ -206,7 +252,7 @@ export const Navbar: React.FC = () => {
                         setShowProfileDropdown(false);
                         navigate('/auth');
                       }}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -224,7 +270,68 @@ export const Navbar: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && user && (
+          <div className="md:hidden py-3 border-t border-slate-200 dark:border-slate-800 space-y-2 animate-in slide-in-from-top-2 duration-150">
+            {/* Mobile Search */}
+            <form onSubmit={handleGlobalSearch} className="relative px-1 mb-3">
+              <input
+                type="text"
+                placeholder="Search projects, members..."
+                value={globalQuery}
+                onChange={e => setGlobalQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
+            </form>
+
+            <nav className="space-y-1">
+              {navLinks.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-brand-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+
+              <Link
+                to="/verify/demo"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                Public Verification Portal
+              </Link>
+
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                  navigate('/auth');
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
 };
+

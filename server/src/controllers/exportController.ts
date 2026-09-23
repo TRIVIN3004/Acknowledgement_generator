@@ -11,7 +11,7 @@ export const exportExcelData = async (req: AuthenticatedRequest, res: Response) 
 
       return {
         'Acknowledgement ID': ack.id,
-        'Verification Hash': ack.qrCodeHash,
+        'Reference Code': ack.qrCodeHash ? `ACK-${ack.qrCodeHash.replace('PRDAMS-ACK-', '')}` : 'N/A',
         'Member Name': member?.name || 'N/A',
         'Member Email': member?.email || 'N/A',
         'Department': member?.department || 'N/A',

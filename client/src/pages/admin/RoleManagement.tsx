@@ -64,9 +64,9 @@ export const RoleManagement: React.FC = () => {
     setTitle(role.title);
     setCategory(role.category);
     setDepartment(role.department);
-    setResponsibilitiesText(role.responsibilities.join('\n'));
-    setRequiredSkillsText(role.requiredSkills.join(', '));
-    setDescription(role.description);
+    setResponsibilitiesText(Array.isArray(role.responsibilities) ? role.responsibilities.join('\n') : String(role.responsibilities || ''));
+    setRequiredSkillsText(Array.isArray(role.requiredSkills) ? role.requiredSkills.join(', ') : String(role.requiredSkills || ''));
+    setDescription(role.description || '');
     setIsModalOpen(true);
   };
 
@@ -190,7 +190,7 @@ export const RoleManagement: React.FC = () => {
                     <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Responsibilities Matrix
                   </p>
                   <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-300">
-                    {role.responsibilities.slice(0, 3).map((resp, i) => (
+                    {(Array.isArray(role.responsibilities) ? role.responsibilities : []).slice(0, 3).map((resp, i) => (
                       <li key={i} className="flex items-start gap-1.5 text-[11px]">
                         <span className="text-purple-500 font-bold">•</span>
                         <span className="line-clamp-1">{resp}</span>
@@ -203,7 +203,7 @@ export const RoleManagement: React.FC = () => {
               {/* Skills Tags */}
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex flex-wrap gap-1">
-                  {role.requiredSkills.map((skill, idx) => (
+                  {(Array.isArray(role.requiredSkills) ? role.requiredSkills : []).map((skill, idx) => (
                     <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium">
                       {skill}
                     </span>

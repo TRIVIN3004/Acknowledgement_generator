@@ -7,6 +7,17 @@ server/node_modules/
 dist/
 build/
 client/dist/
+server/dist/
+.vercel/
+
+# Caches and temporary files
+.vite/
+*.tsbuildinfo
+*.tmp
+*.bak
+*.swp
+*~
+coverage/
 
 # Environment files
 .env
@@ -16,6 +27,8 @@ client/dist/
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # System files
 .DS_Store

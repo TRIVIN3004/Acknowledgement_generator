@@ -34,11 +34,13 @@ export const AuthPage: React.FC = () => {
   const [skills, setSkills] = useState('');
   const [targetRole, setTargetRole] = useState<'admin' | 'member'>('member');
 
-  // If already logged in
-  if (user) {
-    if (user.role === 'admin') navigate('/admin/dashboard');
-    else navigate('/member/dashboard');
-  }
+  // If already logged in, navigate safely inside useEffect
+  React.useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') navigate('/admin/dashboard');
+      else navigate('/member/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

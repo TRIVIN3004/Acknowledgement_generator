@@ -93,14 +93,14 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
   return (
     <div className="space-y-4">
       {/* Top Action Bar */}
-      <div className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
             <h4 className="text-sm font-bold text-slate-900 dark:text-white">Official Verified Digital Letter</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Verification Hash: <span className="font-mono font-bold text-brand-600 dark:text-brand-400">{acknowledgement.qrCodeHash}</span></p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Document Status: <span className="font-bold text-emerald-600 dark:text-emerald-400">AUTHENTIC & DIGITALLY VERIFIED</span></p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
               </div>
             </div>
             <div className="text-right text-xs text-slate-600 space-y-0.5">
-              <p className="font-bold text-slate-900">REF: {acknowledgement.qrCodeHash}</p>
+              <p className="font-bold text-slate-900">REF: ACK-{acknowledgement.qrCodeHash ? acknowledgement.qrCodeHash.replace('PRDAMS-ACK-', '') : 'OFFICIAL'}</p>
               <p>Issue Date: {new Date(acknowledgement.timestamp).toLocaleDateString()}</p>
               <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Status: DIGITALLY VERIFIED</p>
             </div>
@@ -238,7 +238,7 @@ export const AcknowledgementLetterPreview: React.FC<AcknowledgementLetterPreview
                 <QrCode className="w-12 h-12 text-slate-900 mx-auto" />
               </div>
               <span className="text-[8px] font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-300 text-brand-900 block truncate max-w-full">
-                {acknowledgement.qrCodeHash}
+                ACK-{acknowledgement.qrCodeHash ? acknowledgement.qrCodeHash.replace('PRDAMS-ACK-', '') : 'VERIFIED'}
               </span>
             </div>
           </div>

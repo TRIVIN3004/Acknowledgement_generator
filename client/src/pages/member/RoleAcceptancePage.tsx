@@ -266,7 +266,7 @@ export const RoleAcceptancePage: React.FC = () => {
                     <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900/50">
                       <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
                         <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                        Role Officialized & Digitally Signed {asgn.acknowledgement?.qrCodeHash ? `(Hash: ${asgn.acknowledgement.qrCodeHash})` : ''}
+                        Role Officialized & Digitally Signed {asgn.acknowledgement ? `(Ref: ${asgn.acknowledgement.qrCodeHash ? `ACK-${asgn.acknowledgement.qrCodeHash.replace('PRDAMS-ACK-', '')}` : `ACK-${String(asgn.acknowledgement.id || asgn.id).replace(/^ack-|^asgn-/, '').slice(-5).toUpperCase()}`})` : ''}
                       </div>
 
                       {asgn.acknowledgement && (
@@ -346,7 +346,7 @@ export const RoleAcceptancePage: React.FC = () => {
           isOpen={!!activeLetterAck}
           onClose={() => setActiveLetterAck(null)}
           title="Digital Acknowledgement Letter"
-          subtitle={`Hash: ${activeLetterAck.qrCodeHash}`}
+          subtitle="Official Digitally Verified Letter"
           maxWidth="4xl"
         >
           <AcknowledgementLetterPreview

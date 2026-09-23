@@ -38,7 +38,7 @@ export const MyLettersPage: React.FC = () => {
           My Signed Acknowledgement Letters
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Personal repository of verified electronic letters, signature hashes, and PDF downloads
+          Personal repository of verified electronic letters, reference credentials, and PDF downloads
         </p>
       </div>
 
@@ -50,62 +50,68 @@ export const MyLettersPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {letters.map((ack) => (
-            <div key={ack.id} className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1 text-[11px] font-mono font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-2.5 py-1 rounded-lg border border-brand-200 dark:border-brand-900">
-                    <QrCode className="w-3.5 h-3.5" /> {ack.qrCodeHash}
-                  </span>
-                  <span className="text-[10px] text-slate-400">{new Date(ack.timestamp).toLocaleDateString()}</span>
+          {letters.map((ack) => {
+            const refCode = ack.qrCodeHash 
+              ? `ACK-${ack.qrCodeHash.replace('PRDAMS-ACK-', '')}`
+              : (ack.id ? `ACK-${String(ack.id).replace(/^ack-|^asgn-/, '').slice(-5).toUpperCase()}` : 'ACK-VERIFIED');
+            return (
+              <div key={ack.id} className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-200/70 dark:border-emerald-800/40">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                      {refCode}
+                    </span>
+                    <span className="text-[10px] text-slate-400">{new Date(ack.timestamp).toLocaleDateString()}</span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                      {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Nexora Project'}
+                    </h3>
+                    <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">
+                      Role: {(() => {
+                        const fallback = getFallbackRoleDetails(
+                          ack.member?.department || user?.department,
+                          ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle
+                        );
+                        return ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || fallback.title;
+                      })()}
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Signature Mode:</span>
+                      <strong className="text-slate-900 dark:text-white uppercase">{ack.signatureType || 'DIGITAL'}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase">DIGITALLY VERIFIED</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                    {ack.project?.title || (ack as any).projectTitle || (ack as any).assignment?.projectTitle || 'Nexora Project'}
-                  </h3>
-                  <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-                    Role: {(() => {
-                      const fallback = getFallbackRoleDetails(
-                        ack.member?.department || user?.department,
-                        ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle
-                      );
-                      return ack.role?.title || (ack as any).roleTitle || (ack as any).assignment?.roleTitle || fallback.title;
-                    })()}
-                  </p>
-                </div>
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <a
+                    href={`/verify/${ack.qrCodeHash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-500"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" /> Verify Link
+                  </a>
 
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 text-xs space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Signature Mode:</span>
-                    <strong className="text-slate-900 dark:text-white uppercase">{ack.signatureType}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">IP Log:</span>
-                    <span className="font-mono text-slate-700 dark:text-slate-300">{ack.ipAddress}</span>
-                  </div>
+                  <button
+                    onClick={() => setSelectedAck(ack)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-500/20 cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4" /> View / Download PDF
+                  </button>
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <a
-                  href={`/verify/${ack.qrCodeHash}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-500"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" /> Verify Link
-                </a>
-
-                <button
-                  onClick={() => setSelectedAck(ack)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-500/20"
-                >
-                  <Eye className="w-4 h-4" /> View / Download PDF
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -115,7 +121,7 @@ export const MyLettersPage: React.FC = () => {
           isOpen={!!selectedAck}
           onClose={() => setSelectedAck(null)}
           title="Digital Acknowledgement Letter"
-          subtitle={`Hash: ${selectedAck.qrCodeHash}`}
+          subtitle="Official Digitally Verified Record"
           maxWidth="4xl"
         >
           <AcknowledgementLetterPreview

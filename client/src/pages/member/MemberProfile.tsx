@@ -10,7 +10,11 @@ export const MemberProfile: React.FC = () => {
   const [department, setDepartment] = useState(user?.department || 'Software Engineering');
   const [college, setCollege] = useState(user?.college || 'Department of Computer Science');
   const [phone, setPhone] = useState(user?.phone || '+1 (555) 019-2834');
-  const [skills, setSkills] = useState((user?.skills || ['React', 'TypeScript', 'Tailwind CSS']).join(', '));
+  const [skills, setSkills] = useState(
+    Array.isArray(user?.skills) 
+      ? user.skills.join(', ') 
+      : (typeof user?.skills === 'string' ? user.skills : 'React, TypeScript, Tailwind CSS')
+  );
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 

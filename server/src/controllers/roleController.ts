@@ -5,36 +5,6 @@ import { supabase } from '../config/supabase.js';
 
 export const getRoles = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (supabase) {
-      try {
-        const { data: supaRoles } = await supabase.from('roles').select('*');
-        if (supaRoles && Array.isArray(supaRoles)) {
-          supaRoles.forEach((r: any) => {
-            const formatted = {
-              id: r.id,
-              _id: r.id,
-              title: r.title,
-              category: r.category || 'Engineering',
-              department: r.department || 'Software Development',
-              responsibilities: r.responsibilities || [],
-              requiredSkills: r.required_skills || [],
-              description: r.description || `Professional ${r.title} role responsible for project excellence.`,
-              createdAt: r.created_at || new Date().toISOString()
-            };
-
-            const idx = memoryStore.roles.findIndex(x => x.id === formatted.id || x.title.toLowerCase() === formatted.title.toLowerCase());
-            if (idx !== -1) {
-              memoryStore.roles[idx] = { ...memoryStore.roles[idx], ...formatted };
-            } else {
-              memoryStore.roles.unshift(formatted);
-            }
-          });
-        }
-      } catch (err) {
-        console.warn('Supabase getRoles sync notice:', err);
-      }
-    }
-
     return res.json({ success: true, count: memoryStore.roles.length, roles: memoryStore.roles });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });

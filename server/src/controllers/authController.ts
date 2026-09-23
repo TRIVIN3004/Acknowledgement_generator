@@ -170,39 +170,6 @@ export const register = async (req: AuthenticatedRequest, res: Response) => {
 
 export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (supabase && req.user?.email) {
-      try {
-        const { data: supaUser } = await supabase.from('users').select('*').eq('email', req.user.email.toLowerCase()).single();
-        if (supaUser) {
-          const idx = memoryStore.users.findIndex(u => u.email.toLowerCase() === req.user?.email?.toLowerCase());
-          const formatted = {
-            id: supaUser.id,
-            _id: supaUser.id,
-            name: supaUser.name,
-            email: supaUser.email,
-            passwordHash: supaUser.password_hash,
-            role: supaUser.role || 'member',
-            department: supaUser.department || 'Software Engineering',
-            college: supaUser.college || 'Institute of Technology',
-            phone: supaUser.phone || '+1 (555) 000-0000',
-            skills: supaUser.skills || [],
-            status: supaUser.status || 'active',
-            memberId: supaUser.member_id || 'DEV-101',
-            avatarUrl: supaUser.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(supaUser.name)}`,
-            defaultSignature: supaUser.default_signature,
-            createdAt: supaUser.created_at || new Date().toISOString()
-          };
-          if (idx !== -1) {
-            memoryStore.users[idx] = { ...memoryStore.users[idx], ...formatted };
-          } else {
-            memoryStore.users.push(formatted);
-          }
-        }
-      } catch (err) {
-        console.warn('Supabase getProfile sync notice:', err);
-      }
-    }
-
     const user = memoryStore.users.find(u => u.id === req.user?.id || u.email.toLowerCase() === req.user?.email?.toLowerCase());
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -256,41 +223,6 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
 
 export const getAllMembers = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (supabase) {
-      try {
-        const { data: supaUsers } = await supabase.from('users').select('*');
-        if (supaUsers && Array.isArray(supaUsers)) {
-          supaUsers.forEach((u: any) => {
-            const idx = memoryStore.users.findIndex(x => x.email.toLowerCase() === (u.email || '').toLowerCase());
-            const formatted = {
-              id: u.id,
-              _id: u.id,
-              name: u.name,
-              email: u.email,
-              passwordHash: u.password_hash,
-              role: u.role || 'member',
-              department: u.department || 'Software Engineering',
-              college: u.college || 'Institute of Technology',
-              phone: u.phone || '+1 (555) 000-0000',
-              skills: u.skills || [],
-              status: u.status || 'active',
-              memberId: u.member_id || 'DEV-101',
-              avatarUrl: u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name)}`,
-              defaultSignature: u.default_signature,
-              createdAt: u.created_at || new Date().toISOString()
-            };
-            if (idx !== -1) {
-              memoryStore.users[idx] = { ...memoryStore.users[idx], ...formatted };
-            } else {
-              memoryStore.users.push(formatted);
-            }
-          });
-        }
-      } catch (err) {
-        console.warn('Supabase getAllMembers notice:', err);
-      }
-    }
-
     const cleanUsers = memoryStore.users.map(({ passwordHash, ...u }) => u);
     return res.json({ success: true, members: cleanUsers });
   } catch (error: any) {

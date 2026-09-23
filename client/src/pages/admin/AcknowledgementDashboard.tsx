@@ -8,10 +8,11 @@ import {
   Eye, 
   ExternalLink, 
   Calendar, 
-  QrCode, 
+  CheckCircle2, 
   Globe, 
   Building2,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { Acknowledgement } from '../../types';
@@ -48,7 +49,7 @@ export const AcknowledgementDashboard: React.FC = () => {
   const handleExportExcel = async () => {
     try {
       const res = await api.exportExcel();
-      if (res.success && res.data) {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
         const csvContent = "data:text/csv;charset=utf-8," 
           + [Object.keys(res.data[0]).join(","), ...res.data.map((e: any) => Object.values(e).map(val => `"${val}"`).join(","))].join("\n");
         const encodedUri = encodeURI(csvContent);
@@ -58,6 +59,8 @@ export const AcknowledgementDashboard: React.FC = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+      } else {
+        alert('No digital acknowledgement records available for export yet.');
       }
     } catch (err: any) {
       alert(err.message || 'Export failed');
@@ -67,10 +70,26 @@ export const AcknowledgementDashboard: React.FC = () => {
   const handleExportZip = async () => {
     try {
       const res = await api.exportZip();
-      alert(`Export bundle created: ${res.zipFilename} (${res.files.length} letters packaged).`);
+      if (res.files && res.files.length > 0) {
+        alert(`Export bundle created: ${res.zipFilename} (${res.files.length} letters packaged).`);
+      } else {
+        alert('No letters available to package.');
+      }
     } catch (err: any) {
       alert(err.message || 'ZIP Export failed');
     }
+  };
+
+  const formatRefCode = (ack: Acknowledgement) => {
+    if (!ack) return 'ACK-VERIFIED';
+    if (ack.qrCodeHash) {
+      return `ACK-${ack.qrCodeHash.replace('PRDAMS-ACK-', '')}`;
+    }
+    if (ack.id) {
+      const clean = String(ack.id).replace(/^ack-|^asgn-/, '');
+      return `ACK-${clean.slice(-5).toUpperCase()}`;
+    }
+    return 'ACK-VERIFIED';
   };
 
   return (
@@ -83,11 +102,11 @@ export const AcknowledgementDashboard: React.FC = () => {
             Digital Acknowledgements Master Dashboard
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Repository of all signed digital letters, cryptographic hashes, & bulk exports
+            Repository of all signed digital letters, verification records, & bulk exports
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleExportExcel}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
@@ -107,7 +126,7 @@ export const AcknowledgementDashboard: React.FC = () => {
       <div className="relative max-w-md">
         <input
           type="text"
-          placeholder="Search by member, project, role title, or hash..."
+          placeholder="Search by member, project, role title, or ref..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none"
@@ -117,11 +136,11 @@ export const AcknowledgementDashboard: React.FC = () => {
 
       {/* Acknowledgements Master Roster Table */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4">Verification Hash</th>
+                <th className="px-6 py-4">Reference No.</th>
                 <th className="px-6 py-4">Signatory Member</th>
                 <th className="px-6 py-4">Project & Assigned Role</th>
                 <th className="px-6 py-4">Sign Method / Date</th>
@@ -140,11 +159,17 @@ export const AcknowledgementDashboard: React.FC = () => {
               ) : (
                 acknowledgements.map((ack) => (
                   <tr key={ack.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono font-bold text-brand-600 dark:text-brand-400">
-                      <div className="flex items-center gap-1.5">
-                        <QrCode className="w-4 h-4 text-brand-500" />
-                        <span>{ack.qrCodeHash}</span>
-                      </div>
+                    <td className="px-6 py-4">
+                      <a
+                        href={`/verify/${ack.qrCodeHash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/40 font-bold text-[11px] hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors"
+                        title="Click to verify digital certificate"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>{formatRefCode(ack)}</span>
+                      </a>
                     </td>
 
                     <td className="px-6 py-4">
@@ -164,7 +189,7 @@ export const AcknowledgementDashboard: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="space-y-0.5">
                         <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                          {ack.signatureType.toUpperCase()}
+                          {ack.signatureType ? ack.signatureType.toUpperCase() : 'DIGITAL'}
                         </span>
                         <p className="text-[10px] text-slate-400">{new Date(ack.timestamp).toLocaleDateString()}</p>
                       </div>
@@ -174,7 +199,7 @@ export const AcknowledgementDashboard: React.FC = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setSelectedAck(ack)}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 hover:bg-brand-100 font-bold text-xs transition-colors"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 hover:bg-brand-100 font-bold text-xs transition-colors cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" /> View / Download PDF
                         </button>
@@ -202,7 +227,7 @@ export const AcknowledgementDashboard: React.FC = () => {
         <Modal
           isOpen={!!selectedAck}
           onClose={() => setSelectedAck(null)}
-          title={`Digital Acknowledgement Letter — ${selectedAck.qrCodeHash}`}
+          title={`Digital Acknowledgement Letter — ${formatRefCode(selectedAck)}`}
           subtitle={`Member: ${selectedAck.member?.name} • Project: ${selectedAck.project?.title}`}
           maxWidth="4xl"
         >
@@ -245,3 +270,4 @@ export const AcknowledgementDashboard: React.FC = () => {
     </div>
   );
 };
+

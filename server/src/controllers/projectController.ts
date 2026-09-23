@@ -5,45 +5,6 @@ import { supabase } from '../config/supabase.js';
 
 export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // If Supabase DB is connected, fetch latest projects into memoryStore
-    if (supabase) {
-      try {
-        const { data: supaProjects } = await supabase.from('projects').select('*');
-        if (supaProjects && Array.isArray(supaProjects)) {
-          supaProjects.forEach((p: any) => {
-            const formatted = {
-              id: p.id,
-              _id: p.id,
-              title: p.title,
-              description: p.description,
-              category: p.category || 'Enterprise Web Application',
-              technologyStack: Array.isArray(p.technology_stack) ? p.technology_stack : (Array.isArray(p.tech_stack) ? p.tech_stack : ['React', 'TypeScript']),
-              leadId: p.lead_id || 'usr-admin-1',
-              leadName: p.lead_name || 'Project Lead',
-              deadline: p.deadline || '2026-12-31',
-              status: p.status || 'planning',
-              timeline: {
-                assignedAt: p.timeline_assigned_at || p.created_at || new Date().toISOString(),
-                acceptedAt: p.timeline_accepted_at,
-                startedAt: p.timeline_started_at,
-                completedAt: p.timeline_completed_at
-              },
-              createdAt: p.created_at || new Date().toISOString()
-            };
-
-            const idx = memoryStore.projects.findIndex(x => x.id === formatted.id || x.title === formatted.title);
-            if (idx !== -1) {
-              memoryStore.projects[idx] = { ...memoryStore.projects[idx], ...formatted };
-            } else {
-              memoryStore.projects.unshift(formatted);
-            }
-          });
-        }
-      } catch (err) {
-        console.warn('Supabase getProjects sync warning:', err);
-      }
-    }
-
     const { status, category, search } = req.query;
     let list = [...memoryStore.projects];
 
@@ -60,7 +21,7 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
       list = list.filter(p => 
         p.title.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query) ||
-        p.technologyStack.some((t: string) => t.toLowerCase().includes(query))
+        (Array.isArray(p.technologyStack) ? p.technologyStack : []).some((t: string) => t.toLowerCase().includes(query))
       );
     }
 

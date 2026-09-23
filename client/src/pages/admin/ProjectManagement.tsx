@@ -74,7 +74,7 @@ export const ProjectManagement: React.FC = () => {
     setTitle(proj.title);
     setDescription(proj.description);
     setCategory(proj.category);
-    setTechnologyStack(proj.technologyStack.join(', '));
+    setTechnologyStack(Array.isArray(proj.technologyStack) ? proj.technologyStack.join(', ') : (typeof proj.technologyStack === 'string' ? proj.technologyStack : ''));
     setDeadline(proj.deadline);
     setStatus(proj.status);
     setIsModalOpen(true);
@@ -225,7 +225,7 @@ export const ProjectManagement: React.FC = () => {
 
                 {/* Tech Stack Pills */}
                 <div className="flex flex-wrap gap-1.5">
-                  {proj.technologyStack.map((tech, idx) => (
+                  {(Array.isArray(proj.technologyStack) ? proj.technologyStack : (typeof proj.technologyStack === 'string' ? (proj.technologyStack as string).split(',') : ['React'])).map((tech, idx) => (
                     <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-semibold">
                       {tech}
                     </span>

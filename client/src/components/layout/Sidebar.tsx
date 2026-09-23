@@ -68,14 +68,14 @@ export const Sidebar: React.FC = () => {
           </nav>
         </div>
 
-        {/* Quick Demo Switcher Info Box */}
+        {/* Quick Info Box */}
         <div className="p-4 rounded-2xl bg-gradient-to-br from-brand-50 to-sky-50 dark:from-slate-800/80 dark:to-slate-800/40 border border-brand-100 dark:border-slate-700/50">
           <div className="flex items-center gap-2 text-brand-700 dark:text-brand-300 font-bold text-xs">
             <HelpCircle className="w-4 h-4" />
-            Digital Consent Engine
+            Digital Verification Engine
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-            All role acceptances automatically record cryptographic verification hashes & IP timestamps.
+            All role acceptances automatically record official digital verification records & audit timestamps.
           </p>
         </div>
       </div>

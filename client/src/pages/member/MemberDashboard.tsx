@@ -141,7 +141,7 @@ export const MemberDashboard: React.FC = () => {
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm">{proj.title}</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{proj.description}</p>
                 <div className="flex flex-wrap gap-1 pt-1">
-                  {proj.technologyStack.map((tech, idx) => (
+                  {(Array.isArray(proj.technologyStack) ? proj.technologyStack : (typeof proj.technologyStack === 'string' ? (proj.technologyStack as string).split(',') : ['React', 'TypeScript'])).map((tech, idx) => (
                     <span key={idx} className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-[10px] font-semibold border border-slate-200 dark:border-slate-800">
                       {tech}
                     </span>
