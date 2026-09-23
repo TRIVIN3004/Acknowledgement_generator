@@ -4,7 +4,15 @@ import path from 'path';
 import { getInitialData } from '../data/initialSeed.js';
 import { supabase } from './supabase.js';
 
-const storeFilePath = path.join(process.cwd(), 'data', 'persistent_store.json');
+const getStoreFilePath = () => {
+  const inServerData = path.join(process.cwd(), 'server', 'data');
+  if (fs.existsSync(inServerData)) {
+    return path.join(inServerData, 'persistent_store.json');
+  }
+  return path.join(process.cwd(), 'data', 'persistent_store.json');
+};
+
+const storeFilePath = getStoreFilePath();
 
 class InMemoryStore {
   users: any[] = [];
@@ -40,14 +48,44 @@ class InMemoryStore {
       if (fs.existsSync(storeFilePath)) {
         const raw = fs.readFileSync(storeFilePath, 'utf-8');
         const data = JSON.parse(raw);
-        if (data.users && data.users.length > 0) this.users = data.users;
-        if (data.projects && data.projects.length > 0) this.projects = data.projects;
-        if (data.roles && data.roles.length > 0) this.roles = data.roles;
-        if (data.assignments && data.assignments.length > 0) this.assignments = data.assignments;
-        if (Array.isArray(data.acknowledgements)) this.acknowledgements = data.acknowledgements;
+        if (data.users && data.users.length > 0) {
+          data.users.forEach((u: any) => {
+            const idx = this.users.findIndex(x => x.id === u.id || x.email?.toLowerCase() === (u.email || '').toLowerCase());
+            if (idx !== -1) this.users[idx] = { ...this.users[idx], ...u };
+            else this.users.push(u);
+          });
+        }
+        if (data.projects && data.projects.length > 0) {
+          data.projects.forEach((p: any) => {
+            const idx = this.projects.findIndex(x => x.id === p.id || x.title?.toLowerCase() === (p.title || '').toLowerCase());
+            if (idx !== -1) this.projects[idx] = { ...this.projects[idx], ...p };
+            else this.projects.push(p);
+          });
+        }
+        if (data.roles && data.roles.length > 0) {
+          data.roles.forEach((r: any) => {
+            const idx = this.roles.findIndex(x => x.id === r.id || x.title?.toLowerCase() === (r.title || '').toLowerCase());
+            if (idx !== -1) this.roles[idx] = { ...this.roles[idx], ...r };
+            else this.roles.push(r);
+          });
+        }
+        if (data.assignments && data.assignments.length > 0) {
+          data.assignments.forEach((a: any) => {
+            const idx = this.assignments.findIndex(x => x.id === a.id);
+            if (idx !== -1) this.assignments[idx] = { ...this.assignments[idx], ...a };
+            else this.assignments.push(a);
+          });
+        }
+        if (Array.isArray(data.acknowledgements) && data.acknowledgements.length > 0) {
+          data.acknowledgements.forEach((k: any) => {
+            const idx = this.acknowledgements.findIndex(x => x.id === k.id || (k.assignmentId && x.assignmentId === k.assignmentId));
+            if (idx !== -1) this.acknowledgements[idx] = { ...this.acknowledgements[idx], ...k };
+            else this.acknowledgements.push(k);
+          });
+        }
         if (Array.isArray(data.notifications)) this.notifications = data.notifications;
         if (Array.isArray(data.auditLogs)) this.auditLogs = data.auditLogs;
-        console.log(`💾 [PRDAMS Data Engine] Loaded persistent store from disk (${this.acknowledgements.length} signed letters, ${this.users.length} users).`);
+        console.log(`💾 [PRDAMS Data Engine] Loaded persistent store from disk (${this.projects.length} projects, ${this.assignments.length} assignments, ${this.acknowledgements.length} signed letters, ${this.users.length} users).`);
       }
     } catch (e) {
       console.warn('⚠️ Failed to load persistent_store.json:', e);

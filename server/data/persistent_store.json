@@ -885,25 +885,252 @@
   ],
   "projects": [
     {
-      "id": "proj-parent-teacher",
-      "_id": "proj-parent-teacher",
-      "title": "Parent Teacher app",
-      "description": "Enterprise Parent teacher app software platform developed by Nexora Technologies.",
-      "category": "Software Engineering",
+      "id": "proj-ai-smart-recruitment-platform",
+      "_id": "proj-ai-smart-recruitment-platform",
+      "title": "AI smart Recruitment platform",
+      "description": "Enterprise AI smart Recruitment platform software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
       "technologyStack": [
         "React",
         "TypeScript",
         "Node.js",
-        "PostgreSQL"
+        "PostgreSQL",
+        "Tailwind CSS"
       ],
       "leadId": "EMP-001",
       "leadName": "Trivin (Admin)",
-      "deadline": "2026-12-31",
+      "deadline": "2026-11-30",
       "status": "in_progress",
       "timeline": {
-        "assignedAt": "2026-07-28T06:33:32.881Z"
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
       },
-      "createdAt": "2026-07-28T06:33:32.881Z"
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-nexora-ai-parakit-ai",
+      "_id": "proj-nexora-ai-parakit-ai",
+      "title": "Nexora AI (parakit AI)",
+      "description": "Enterprise Nexora AI (parakit AI) software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "planning",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-nexora-erp",
+      "_id": "proj-nexora-erp",
+      "title": "Nexora ERP",
+      "description": "Enterprise Nexora ERP software platform developed by Nexora Technologies.",
+      "category": "Enterprise Web Application",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-ai-powered-internship-management",
+      "_id": "proj-ai-powered-internship-management",
+      "title": "AI powered internship management",
+      "description": "Enterprise AI powered internship management software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "planning",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-ai-interview-preparation-assistant",
+      "_id": "proj-ai-interview-preparation-assistant",
+      "title": "AI interview preparation assistant",
+      "description": "Enterprise AI interview preparation assistant software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-lekquant-website",
+      "_id": "proj-lekquant-website",
+      "title": "lekquant website",
+      "description": "Enterprise lekquant website software platform developed by Nexora Technologies.",
+      "category": "Enterprise Web Application",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "planning",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-ai-resume-screening-system",
+      "_id": "proj-ai-resume-screening-system",
+      "title": "AI resume screening system",
+      "description": "Enterprise AI resume screening system software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-ai-powered-customer-support-chatbot",
+      "_id": "proj-ai-powered-customer-support-chatbot",
+      "title": "AI Powered Customer Support Chatbot",
+      "description": "Enterprise AI Powered Customer Support Chatbot software platform developed by Nexora Technologies.",
+      "category": "Artificial Intelligence",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "planning",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-electrical-and-plumbing-design",
+      "_id": "proj-electrical-and-plumbing-design",
+      "title": "Electrical and plumbing design",
+      "description": "Enterprise Electrical and plumbing design software platform developed by Nexora Technologies.",
+      "category": "Product Design",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-supermarket-project",
+      "_id": "proj-supermarket-project",
+      "title": "Supermarket project",
+      "description": "Enterprise Supermarket project software platform developed by Nexora Technologies.",
+      "category": "Enterprise Web Application",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "planning",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "proj-parent-teacher-app",
+      "_id": "proj-parent-teacher-app",
+      "title": "Parent teacher app",
+      "description": "Enterprise Parent teacher app software platform developed by Nexora Technologies.",
+      "category": "Enterprise Web Application",
+      "technologyStack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "leadId": "EMP-001",
+      "leadName": "Trivin (Admin)",
+      "deadline": "2026-11-30",
+      "status": "in_progress",
+      "timeline": {
+        "assignedAt": "2026-02-01T09:00:00.000Z",
+        "startedAt": "2026-02-05T08:00:00.000Z"
+      },
+      "createdAt": "2026-02-01T09:00:00.000Z"
     }
   ],
   "roles": [
@@ -998,35 +1225,647 @@
   ],
   "assignments": [
     {
-      "id": "asgn-pt-backend",
-      "_id": "asgn-pt-backend",
-      "projectId": "proj-parent-teacher",
+      "id": "asgn-emp-0001-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-0001-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-1",
+      "memberId": "EMP-0001",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-0001-nexora-ai-parakit-ai",
+      "_id": "asgn-emp-0001-nexora-ai-parakit-ai",
+      "projectId": "proj-nexora-ai-parakit-ai",
       "roleId": "role-2",
       "memberId": "EMP-0001",
       "assignedBy": "EMP-001",
-      "status": "accepted",
-      "assignedAt": "2026-07-28T06:33:32.881Z",
-      "respondedAt": "2026-07-28T06:33:49.913Z"
-    }
-  ],
-  "acknowledgements": [
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
     {
-      "id": "ack-1785220429913",
-      "_id": "ack-1785220429913",
-      "assignmentId": "asgn-pt-backend",
-      "projectId": "proj-parent-teacher",
+      "id": "asgn-emp-002-nexora-erp",
+      "_id": "asgn-emp-002-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-002",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-002-ai-powered-internship-management",
+      "_id": "asgn-emp-002-ai-powered-internship-management",
+      "projectId": "proj-ai-powered-internship-management",
       "roleId": "role-2",
-      "memberId": "EMP-0001",
-      "signatureType": "draw",
-      "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-      "typedName": "TRIVIN S",
-      "ipAddress": "127.0.0.1",
-      "userAgent": "Chrome Agent Tester",
-      "consentAccepted": true,
-      "qrCodeHash": "PRDAMS-ACK-PT-998877",
-      "timestamp": "2026-07-28T06:33:49.913Z"
+      "memberId": "EMP-002",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-003-nexora-erp",
+      "_id": "asgn-emp-003-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-4",
+      "memberId": "EMP-003",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-004-nexora-erp",
+      "_id": "asgn-emp-004-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-004",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-004-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-004-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-1",
+      "memberId": "EMP-004",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-004-ai-interview-preparation-assistant",
+      "_id": "asgn-emp-004-ai-interview-preparation-assistant",
+      "projectId": "proj-ai-interview-preparation-assistant",
+      "roleId": "role-2",
+      "memberId": "EMP-004",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-004-nexora-ai-parakit-ai",
+      "_id": "asgn-emp-004-nexora-ai-parakit-ai",
+      "projectId": "proj-nexora-ai-parakit-ai",
+      "roleId": "role-1",
+      "memberId": "EMP-004",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-005-nexora-erp",
+      "_id": "asgn-emp-005-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-005",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-005-lekquant-website",
+      "_id": "asgn-emp-005-lekquant-website",
+      "projectId": "proj-lekquant-website",
+      "roleId": "role-1",
+      "memberId": "EMP-005",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-005-nexora-ai-parakit-ai",
+      "_id": "asgn-emp-005-nexora-ai-parakit-ai",
+      "projectId": "proj-nexora-ai-parakit-ai",
+      "roleId": "role-2",
+      "memberId": "EMP-005",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-006-nexora-erp",
+      "_id": "asgn-emp-006-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-5",
+      "memberId": "EMP-006",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-007-nexora-erp",
+      "_id": "asgn-emp-007-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-007",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-007-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-007-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-1",
+      "memberId": "EMP-007",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-008-nexora-erp",
+      "_id": "asgn-emp-008-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-4",
+      "memberId": "EMP-008",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-008-ai-resume-screening-system",
+      "_id": "asgn-emp-008-ai-resume-screening-system",
+      "projectId": "proj-ai-resume-screening-system",
+      "roleId": "role-4",
+      "memberId": "EMP-008",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-008-nexora-ai-parakit-ai",
+      "_id": "asgn-emp-008-nexora-ai-parakit-ai",
+      "projectId": "proj-nexora-ai-parakit-ai",
+      "roleId": "role-4",
+      "memberId": "EMP-008",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-010-nexora-erp",
+      "_id": "asgn-emp-010-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-010",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-010-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-010-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-2",
+      "memberId": "EMP-010",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-011-nexora-erp",
+      "_id": "asgn-emp-011-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-011",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-011-ai-powered-customer-support-chatbot",
+      "_id": "asgn-emp-011-ai-powered-customer-support-chatbot",
+      "projectId": "proj-ai-powered-customer-support-chatbot",
+      "roleId": "role-2",
+      "memberId": "EMP-011",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-012-nexora-erp",
+      "_id": "asgn-emp-012-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-012",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-012-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-012-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-2",
+      "memberId": "EMP-012",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-013-nexora-erp",
+      "_id": "asgn-emp-013-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-4",
+      "memberId": "EMP-013",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-013-electrical-and-plumbing-design",
+      "_id": "asgn-emp-013-electrical-and-plumbing-design",
+      "projectId": "proj-electrical-and-plumbing-design",
+      "roleId": "role-4",
+      "memberId": "EMP-013",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-014-nexora-erp",
+      "_id": "asgn-emp-014-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-014",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-014-electrical-and-plumbing-design",
+      "_id": "asgn-emp-014-electrical-and-plumbing-design",
+      "projectId": "proj-electrical-and-plumbing-design",
+      "roleId": "role-2",
+      "memberId": "EMP-014",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-015-nexora-erp",
+      "_id": "asgn-emp-015-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-015",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-015-electrical-and-plumbing-design",
+      "_id": "asgn-emp-015-electrical-and-plumbing-design",
+      "projectId": "proj-electrical-and-plumbing-design",
+      "roleId": "role-2",
+      "memberId": "EMP-015",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-016-nexora-erp",
+      "_id": "asgn-emp-016-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-016",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-018-nexora-erp",
+      "_id": "asgn-emp-018-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-018",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-019-nexora-erp",
+      "_id": "asgn-emp-019-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-4",
+      "memberId": "EMP-019",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-019-supermarket-project",
+      "_id": "asgn-emp-019-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-4",
+      "memberId": "EMP-019",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-020-nexora-erp",
+      "_id": "asgn-emp-020-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-020",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-021-nexora-erp",
+      "_id": "asgn-emp-021-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-021",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-022-nexora-erp",
+      "_id": "asgn-emp-022-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-022",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-023-nexora-erp",
+      "_id": "asgn-emp-023-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-023",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-024-lekquant-website",
+      "_id": "asgn-emp-024-lekquant-website",
+      "projectId": "proj-lekquant-website",
+      "roleId": "role-1",
+      "memberId": "EMP-024",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-025-nexora-erp",
+      "_id": "asgn-emp-025-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-025",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-026-nexora-erp",
+      "_id": "asgn-emp-026-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-026",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-027-nexora-erp",
+      "_id": "asgn-emp-027-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-027",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-027-supermarket-project",
+      "_id": "asgn-emp-027-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-1",
+      "memberId": "EMP-027",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-028-nexora-erp",
+      "_id": "asgn-emp-028-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-028",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-028-nexora-ai-parakit-ai",
+      "_id": "asgn-emp-028-nexora-ai-parakit-ai",
+      "projectId": "proj-nexora-ai-parakit-ai",
+      "roleId": "role-1",
+      "memberId": "EMP-028",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-029-nexora-erp",
+      "_id": "asgn-emp-029-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-029",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-029-supermarket-project",
+      "_id": "asgn-emp-029-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-1",
+      "memberId": "EMP-029",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-030-nexora-erp",
+      "_id": "asgn-emp-030-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-030",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-031-nexora-erp",
+      "_id": "asgn-emp-031-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-031",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-031-ai-powered-customer-support-chatbot",
+      "_id": "asgn-emp-031-ai-powered-customer-support-chatbot",
+      "projectId": "proj-ai-powered-customer-support-chatbot",
+      "roleId": "role-2",
+      "memberId": "EMP-031",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-032-nexora-erp",
+      "_id": "asgn-emp-032-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-032",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-033-nexora-erp",
+      "_id": "asgn-emp-033-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-033",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-033-supermarket-project",
+      "_id": "asgn-emp-033-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-1",
+      "memberId": "EMP-033",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-034-ai-smart-recruitment-platform",
+      "_id": "asgn-emp-034-ai-smart-recruitment-platform",
+      "projectId": "proj-ai-smart-recruitment-platform",
+      "roleId": "role-2",
+      "memberId": "EMP-034",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-034-ai-powered-internship-management",
+      "_id": "asgn-emp-034-ai-powered-internship-management",
+      "projectId": "proj-ai-powered-internship-management",
+      "roleId": "role-1",
+      "memberId": "EMP-034",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-035-nexora-erp",
+      "_id": "asgn-emp-035-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-035",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-036-nexora-erp",
+      "_id": "asgn-emp-036-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-036",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-037-parent-teacher-app",
+      "_id": "asgn-emp-037-parent-teacher-app",
+      "projectId": "proj-parent-teacher-app",
+      "roleId": "role-2",
+      "memberId": "EMP-037",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-038-nexora-erp",
+      "_id": "asgn-emp-038-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-038",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-039-nexora-erp",
+      "_id": "asgn-emp-039-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-039",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-041-nexora-erp",
+      "_id": "asgn-emp-041-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-1",
+      "memberId": "EMP-041",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-042-supermarket-project",
+      "_id": "asgn-emp-042-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-2",
+      "memberId": "EMP-042",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-043-supermarket-project",
+      "_id": "asgn-emp-043-supermarket-project",
+      "projectId": "proj-supermarket-project",
+      "roleId": "role-1",
+      "memberId": "EMP-043",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
+    },
+    {
+      "id": "asgn-emp-40-nexora-erp",
+      "_id": "asgn-emp-40-nexora-erp",
+      "projectId": "proj-nexora-erp",
+      "roleId": "role-2",
+      "memberId": "EMP-40",
+      "assignedBy": "EMP-001",
+      "status": "pending",
+      "assignedAt": "2026-02-10T10:00:00.000Z"
     }
   ],
+  "acknowledgements": [],
   "notifications": [],
   "auditLogs": [
     {
@@ -1039,7 +1878,7 @@
       "targetType": "SYSTEM",
       "targetId": "users_rows.csv",
       "details": "Loaded 42 employee accounts without profile pictures.",
-      "timestamp": "2026-07-28T06:33:32.877Z"
+      "timestamp": "2026-09-23T08:33:38.055Z"
     }
   ]
 }

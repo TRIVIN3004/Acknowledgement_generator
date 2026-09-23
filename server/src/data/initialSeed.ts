@@ -62,8 +62,8 @@ export const getInitialData = () => {
     }
   ];
 
-  const projects: any[] = [];
-  const assignments: any[] = [];
+  const projects = csvData.projects && csvData.projects.length > 0 ? csvData.projects : fallbackProjects;
+  const assignments = csvData.assignments && csvData.assignments.length > 0 ? csvData.assignments : [];
 
   const roles = [
     {

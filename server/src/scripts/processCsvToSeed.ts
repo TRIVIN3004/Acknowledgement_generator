@@ -110,23 +110,27 @@ export function parseUsersCsv() {
   }
 
   // Create Projects
-  const projects = Array.from(projectTitleSet).map((pTitle, idx) => ({
-    id: `proj-${idx + 1}`,
-    _id: `proj-${idx + 1}`,
-    title: pTitle,
-    description: `Enterprise ${pTitle} application built by Nexora Technologies.`,
-    category: pTitle.toLowerCase().includes('ai') ? 'Artificial Intelligence' : (pTitle.toLowerCase().includes('design') ? 'Product Design' : 'Enterprise Web Application'),
-    technologyStack: ['React', 'TypeScript', 'Node.js', 'Python', 'Tailwind CSS'],
-    leadId: 'EMP-001',
-    leadName: 'Trivin (Admin)',
-    deadline: '2026-11-30',
-    status: idx % 2 === 0 ? 'in_progress' : 'planning',
-    timeline: {
-      assignedAt: '2026-02-01T09:00:00.000Z',
-      startedAt: '2026-02-05T08:00:00.000Z'
-    },
-    createdAt: '2026-02-01T09:00:00.000Z'
-  }));
+  const projects = Array.from(projectTitleSet).map((pTitle, idx) => {
+    const slug = pTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const id = `proj-${slug || idx + 1}`;
+    return {
+      id,
+      _id: id,
+      title: pTitle,
+      description: `Enterprise ${pTitle} software platform developed by Nexora Technologies.`,
+      category: pTitle.toLowerCase().includes('ai') ? 'Artificial Intelligence' : (pTitle.toLowerCase().includes('design') ? 'Product Design' : 'Enterprise Web Application'),
+      technologyStack: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Tailwind CSS'],
+      leadId: 'EMP-001',
+      leadName: 'Trivin (Admin)',
+      deadline: '2026-11-30',
+      status: idx % 2 === 0 ? 'in_progress' : 'planning',
+      timeline: {
+        assignedAt: '2026-02-01T09:00:00.000Z',
+        startedAt: idx % 2 === 0 ? '2026-02-05T08:00:00.000Z' : undefined
+      },
+      createdAt: '2026-02-01T09:00:00.000Z'
+    };
+  });
 
   const defaultRoles = [
     { id: 'role-1', title: 'Frontend Developer', category: 'Frontend', department: 'Engineering' },
@@ -137,8 +141,8 @@ export function parseUsersCsv() {
   ];
 
   const assignments = userProjectPairs.map((pair, idx) => {
-    const proj = projects.find(p => p.title === pair.projectTitle);
-    const user = parsedUsers.find(u => u.id === pair.userId || u.email.toLowerCase() === (pair.userId || '').toLowerCase());
+    const proj = projects.find(p => p.title.toLowerCase() === pair.projectTitle.toLowerCase());
+    const user = parsedUsers.find(u => u.id === pair.userId || u.email.toLowerCase() === (pair.userEmail || '').toLowerCase());
     
     let roleId = 'role-1';
     if (user) {
@@ -152,10 +156,12 @@ export function parseUsersCsv() {
       roleId = defaultRoles[idx % defaultRoles.length].id;
     }
 
+    const asgnId = `asgn-${pair.userId.toLowerCase()}-${proj?.id ? proj.id.replace('proj-', '') : idx + 1}`;
+
     return {
-      id: `asgn-${idx + 1}`,
-      _id: `asgn-${idx + 1}`,
-      projectId: proj ? proj.id : 'proj-1',
+      id: asgnId,
+      _id: asgnId,
+      projectId: proj ? proj.id : 'proj-nexora-erp',
       roleId,
       memberId: pair.userId,
       assignedBy: 'EMP-001',
